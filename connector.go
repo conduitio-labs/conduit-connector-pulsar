@@ -1,4 +1,4 @@
-package connectorname
+package apachepulsar
 
 import sdk "github.com/conduitio/conduit-connector-sdk"
 

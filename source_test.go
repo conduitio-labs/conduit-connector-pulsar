@@ -1,16 +1,16 @@
-package connectorname_test
+package apachepulsar_test
 
 import (
 	"context"
 	"testing"
 
-	connectorname "github.com/conduitio/conduit-connector-connectorname"
+	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/matryer/is"
 )
 
 func TestTeardownSource_NoOpen(t *testing.T) {
 	is := is.New(t)
-	con := connectorname.NewSource()
+	con := apachepulsar.NewSource()
 	err := con.Teardown(context.Background())
 	is.NoErr(err)
 }
