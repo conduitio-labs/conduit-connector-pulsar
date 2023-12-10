@@ -44,6 +44,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	if err != nil {
 		return fmt.Errorf("invalid config: %w", err)
 	}
+	
 	return nil
 }
 
@@ -105,6 +106,8 @@ func (s *Source) Ack(ctx context.Context, _ sdk.Position) error {
 }
 
 func (s *Source) Teardown(ctx context.Context) error {
-	s.consumer.Close()
+	if s.consumer != nil {
+		s.consumer.Close()
+	}
 	return nil
 }
