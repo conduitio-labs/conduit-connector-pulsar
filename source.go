@@ -100,6 +100,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	if err != nil {
 		return fmt.Errorf("invalid config: %w", err)
 	}
+
 	if stype, ok := cfg["subscriptionType"]; ok {
 		subscriptionType, ok := ParseSubscriptionType(stype)
 		if !ok {
@@ -147,6 +148,8 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 
 	position := sdk.Position(msg.ID().Serialize())
 
+	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Setting position for message")
+
 	// TODO: fill these up
 	var metadata sdk.Metadata
 	var key sdk.Data
@@ -161,6 +164,8 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 }
 
 func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
+	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Attempting to ack message")
+
 	msgID, err := pulsar.DeserializeMessageID(position)
 	if err != nil {
 		return fmt.Errorf("failed to deserialize message ID: %w", err)

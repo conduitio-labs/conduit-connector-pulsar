@@ -24,9 +24,9 @@ func TestSource_Integration(t *testing.T) {
 	ctx := context.Background()
 
 	err := con.Configure(ctx, map[string]string{
-		"URL":          "pulsar://localhost:6650",
-		"topic":        "source_test",
-		"subscription": "source_test",
+		"URL":              "pulsar://localhost:6650",
+		"topic":            "source_test",
+		"subscriptionName": "source_test",
 	})
 	is.NoErr(err)
 
