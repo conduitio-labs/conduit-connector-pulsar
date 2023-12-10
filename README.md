@@ -1,11 +1,12 @@
-# Conduit Connector for <resource>
-[Conduit](https://conduit.io) for <resource>.
+# Conduit Connector Apache Pulsar
+
+The Apache Pulsar connector provides both a source and a destination connector for [Apache Pulsar](https://pulsar.apache.org/).
 
 ## How to build?
 Run `make build` to build the connector.
 
 ## Testing
-Run `make test` to run all the unit tests. Run `make test-integration` to run the integration tests.
+Run `make test` to run all the unit tests. Run `make test-integration` to run the integration tests. Tests require Docker to be installed and running. The command will handle starting and stopping docker containers for you.
 
 The Docker compose file at `test/docker-compose.yml` can be used to run the required resource locally.
 
@@ -16,21 +17,17 @@ A source connector pulls data from an external resource and pushes it to downstr
 
 | name                  | description                           | required | default value |
 |-----------------------|---------------------------------------|----------|---------------|
-| `source_config_param` | Description of `source_config_param`. | true     | 1000          |
+| `URL`             | The service URL for the Pulsar service                            | true     |           |
+| `topic`           | Topic specifies the topic the consumer will subscribe on          | true     |           |
+| `subscription`    | SubscriptionName specifies the subscription name for the consumer | true     |           |
+
 
 ## Destination
 A destination connector pushes data from upstream resources to an external resource via Conduit.
 
 ### Configuration
 
-| name                       | description                                | required | default value |
-|----------------------------|--------------------------------------------|----------|---------------|
-| `destination_config_param` | Description of `destination_config_param`. | true     | 1000          |
-
-## Known Issues & Limitations
-* Known issue A
-* Limitation A
-
-## Planned work
-- [ ] Item A
-- [ ] Item B
+| name                  | description                           | required | default value |
+|-----------------------|---------------------------------------|----------|---------------|
+| `URL`             | The service URL for the Pulsar service                            | true     |           |
+| `topic`           | Topic specifies the topic the producer will be publishing on      | true     |           |

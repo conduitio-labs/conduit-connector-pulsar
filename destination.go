@@ -24,9 +24,6 @@ type DestinationConfig struct {
 
 	URL   string `json:"URL" validate:"required"`
 	Topic string `json:"topic" validate:"required"`
-
-	// DestinationConfigParam must be either yes or no (defaults to yes).
-	DestinationConfigParam string `validate:"inclusion=yes|no" default:"yes"`
 }
 
 func NewDestination() sdk.Destination {
