@@ -25,8 +25,8 @@ func TestSource_Integration(t *testing.T) {
 
 	err := con.Configure(ctx, map[string]string{
 		"URL":          "pulsar://localhost:6650",
-		"topic":        "test",
-		"subscription": "test",
+		"topic":        "source_test",
+		"subscription": "source_test",
 	})
 	is.NoErr(err)
 
@@ -53,7 +53,7 @@ func produceExampleMsg(is *is.I) {
 	defer client.Close()
 
 	producer, err := client.CreateProducer(pulsar.ProducerOptions{
-		Topic: "test",
+		Topic: "source_test",
 	})
 	is.NoErr(err)
 
