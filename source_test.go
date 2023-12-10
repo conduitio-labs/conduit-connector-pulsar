@@ -18,7 +18,7 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 
 func TestSource_Integration(t *testing.T) {
 	is := is.New(t)
-	produceExampleMsgs(is)
+	produceExampleMsg(is)
 
 	con := apachepulsar.NewSource()
 	ctx := context.Background()
@@ -38,15 +38,13 @@ func TestSource_Integration(t *testing.T) {
 		is.NoErr(err)
 	}()
 
-	produceExampleMsgs(is)
-
 	record, err := con.Read(ctx)
 	is.NoErr(err)
 
 	is.Equal(string(record.Payload.After.Bytes()), "example message")
 }
 
-func produceExampleMsgs(is *is.I) {
+func produceExampleMsg(is *is.I) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL: "pulsar://localhost:6650",
 	})
