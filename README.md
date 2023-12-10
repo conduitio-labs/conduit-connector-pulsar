@@ -17,9 +17,10 @@ A source connector pulls data from an external resource and pushes it to downstr
 
 | name                  | description                           | required | default value |
 |-----------------------|---------------------------------------|----------|---------------|
-| `URL`             | The service URL for the Pulsar service                            | true     |           |
-| `topic`           | Topic specifies the topic the consumer will subscribe on          | true     |           |
-| `subscription`    | SubscriptionName specifies the subscription name for the consumer | true     |           |
+| `URL`                 | The service URL for the Pulsar service                            | true     |           |
+| `topic`               | Topic specifies the topic the consumer will subscribe on          | true     |           |
+| `subscriptionName`    | SubscriptionName specifies the subscription name for the consumer | true     |           |
+| `subscriptionType`    | SubscriptionType specifies the subscription type to be used when subscribing to a topic. | false     | exclusive |
 
 
 ## Destination
@@ -31,3 +32,4 @@ A destination connector pushes data from upstream resources to an external resou
 |-----------------------|---------------------------------------|----------|---------------|
 | `URL`             | The service URL for the Pulsar service                            | true     |           |
 | `topic`           | Topic specifies the topic the producer will be publishing on      | true     |           |
+

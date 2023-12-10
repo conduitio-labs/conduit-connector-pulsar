@@ -25,9 +25,61 @@ type Source struct {
 type SourceConfig struct {
 	Config
 
-	URL          string `json:"URL" validate:"required"`
-	Topic        string `json:"topic" validate:"required"`
-	Subscription string `json:"subscription" validate:"required"`
+	URL              string           `json:"URL" validate:"required"`
+	Topic            string           `json:"topic" validate:"required"`
+	SubscriptionName string           `json:"subscriptionName" validate:"required"`
+	SubscriptionType SubscriptionType `json:"subscriptionType"`
+}
+
+type SubscriptionType string
+
+const (
+	// Exclusive there can be only 1 consumer on the same topic with the same subscription name
+	Exclusive SubscriptionType = "exclusive"
+
+	// Shared subscription mode, multiple consumer will be able to use the same subscription name
+	// and the messages will be dispatched according to
+	// a round-robin rotation between the connected consumers
+	Shared SubscriptionType = "shared"
+
+	// Failover subscription mode, multiple consumer will be able to use the same subscription name
+	// but only 1 consumer will receive the messages.
+	// If that consumer disconnects, one of the other connected consumers will start receiving messages.
+	Failover SubscriptionType = "failover"
+
+	// KeyShared subscription mode, multiple consumer will be able to use the same
+	// subscription and all messages with the same key will be dispatched to only one consumer
+	KeyShared SubscriptionType = "key_shared"
+)
+
+func ParseSubscriptionType(s string) (SubscriptionType, bool) {
+	switch s {
+	case string(Exclusive):
+		return Exclusive, true
+	case string(Shared):
+		return Shared, true
+	case string(Failover):
+		return Failover, true
+	case string(KeyShared):
+		return KeyShared, true
+	default:
+		return "", false
+	}
+}
+
+func (s SubscriptionType) PulsarType() pulsar.SubscriptionType {
+	switch s {
+	case Exclusive:
+		return pulsar.Exclusive
+	case Shared:
+		return pulsar.Shared
+	case Failover:
+		return pulsar.Failover
+	case KeyShared:
+		return pulsar.KeyShared
+	default:
+		return pulsar.Exclusive
+	}
 }
 
 func NewSource() sdk.Source {
@@ -44,7 +96,15 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	if err != nil {
 		return fmt.Errorf("invalid config: %w", err)
 	}
-	
+	if stype, ok := cfg["subscriptionType"]; ok {
+		subscriptionType, ok := ParseSubscriptionType(stype)
+		if !ok {
+			return fmt.Errorf("invalid subscriptionType: %s", stype)
+		}
+
+		s.config.SubscriptionType = subscriptionType
+	}
+
 	return nil
 }
 
@@ -56,9 +116,12 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 
+	subscriptionType := s.config.SubscriptionType.PulsarType()
+
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
-		SubscriptionName: s.config.Subscription,
+		SubscriptionName: s.config.SubscriptionName,
+		Type:             subscriptionType,
 	})
 	if err != nil {
 		client.Close()

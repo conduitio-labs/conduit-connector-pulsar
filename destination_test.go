@@ -25,8 +25,8 @@ func TestDestination_Integration(t *testing.T) {
 
 	err := con.Configure(ctx, map[string]string{
 		"URL":          "pulsar://localhost:6650",
-		"topic":        "test",
-		"subscription": "test",
+		"topic":        "destination_test",
+		"subscription": "destination_test",
 	})
 	is.NoErr(err)
 
@@ -60,8 +60,8 @@ func TestDestination_Integration(t *testing.T) {
 		defer client.Close()
 
 		consumer, err := client.Subscribe(pulsar.ConsumerOptions{
-			Topic:            "test",
-			SubscriptionName: "test",
+			Topic:            "destination_test",
+			SubscriptionName: "destination_test",
 		})
 		is.NoErr(err)
 
