@@ -40,8 +40,10 @@ func TestSource_Integration(t *testing.T) {
 
 	record, err := con.Read(ctx)
 	is.NoErr(err)
-
 	is.Equal(string(record.Payload.After.Bytes()), "example message")
+
+	err = con.Ack(ctx, record.Position)
+	is.NoErr(err)
 }
 
 func produceExampleMsg(is *is.I) {

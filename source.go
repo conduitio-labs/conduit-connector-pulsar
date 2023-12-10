@@ -4,7 +4,6 @@ package apachepulsar
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 
@@ -16,7 +15,7 @@ type Source struct {
 	sdk.UnimplementedSource
 
 	consumer pulsar.Consumer
-	received []pulsar.Message
+	received map[pulsar.MessageID]pulsar.Message
 	mx       *sync.Mutex
 
 	config SourceConfig
@@ -83,7 +82,12 @@ func (s SubscriptionType) PulsarType() pulsar.SubscriptionType {
 }
 
 func NewSource() sdk.Source {
-	return sdk.SourceWithMiddleware(&Source{mx: &sync.Mutex{}}, sdk.DefaultSourceMiddleware()...)
+	source := &Source{
+		mx:       &sync.Mutex{},
+		received: make(map[pulsar.MessageID]pulsar.Message),
+	}
+
+	return sdk.SourceWithMiddleware(source, sdk.DefaultSourceMiddleware()...)
 }
 
 func (s *Source) Parameters() map[string]sdk.Parameter {
@@ -138,10 +142,12 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	}
 
 	s.mx.Lock()
-	s.received = append(s.received, msg)
+	s.received[msg.ID()] = msg
 	s.mx.Unlock()
 
-	var position sdk.Position
+	position := sdk.Position(msg.ID().Serialize())
+
+	// TODO: fill these up
 	var metadata sdk.Metadata
 	var key sdk.Data
 	var payload sdk.Data = sdk.RawData(msg.Payload())
@@ -154,19 +160,21 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	), nil
 }
 
-func (s *Source) Ack(ctx context.Context, _ sdk.Position) error {
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
-	var err error
-	for _, msg := range s.received {
-		ackErr := s.consumer.Ack(msg)
-		if ackErr != nil {
-			err = errors.Join(err, fmt.Errorf("failed to ack message: %w", ackErr))
-		}
+func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
+	msgID, err := pulsar.DeserializeMessageID(position)
+	if err != nil {
+		return fmt.Errorf("failed to deserialize message ID: %w", err)
 	}
 
-	return err
+	s.mx.Lock()
+	defer s.mx.Unlock()
+	msg, ok := s.received[msgID]
+	if ok {
+		delete(s.received, msgID)
+		return s.consumer.Ack(msg)
+	}
+
+	return fmt.Errorf("message not found for position: %s", string(position))
 }
 
 func (s *Source) Teardown(ctx context.Context) error {
