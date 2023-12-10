@@ -61,6 +61,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		SubscriptionName: s.config.Subscription,
 	})
 	if err != nil {
+		client.Close()
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
 
@@ -97,7 +98,7 @@ func (s *Source) Ack(ctx context.Context, _ sdk.Position) error {
 	var err error
 	for _, msg := range s.received {
 		ackErr := s.consumer.Ack(msg)
-		if err != nil {
+		if ackErr != nil {
 			err = errors.Join(err, fmt.Errorf("failed to ack message: %w", ackErr))
 		}
 	}
