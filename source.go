@@ -15,7 +15,7 @@ type Source struct {
 	sdk.UnimplementedSource
 
 	consumer pulsar.Consumer
-	received map[pulsar.MessageID]pulsar.Message
+	received map[string]pulsar.Message
 	mx       *sync.Mutex
 
 	config SourceConfig
@@ -82,7 +82,7 @@ func (s SubscriptionType) PulsarType() pulsar.SubscriptionType {
 func NewSource() sdk.Source {
 	source := &Source{
 		mx:       &sync.Mutex{},
-		received: make(map[pulsar.MessageID]pulsar.Message),
+		received: make(map[string]pulsar.Message),
 	}
 
 	return sdk.SourceWithMiddleware(source, sdk.DefaultSourceMiddleware()...)
@@ -141,7 +141,7 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	}
 
 	s.mx.Lock()
-	s.received[msg.ID()] = msg
+	s.received[msg.ID().String()] = msg
 	s.mx.Unlock()
 
 	position := sdk.Position(msg.ID().Serialize())
@@ -171,9 +171,9 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	msg, ok := s.received[msgID]
+	msg, ok := s.received[msgID.String()]
 	if ok {
-		delete(s.received, msgID)
+		delete(s.received, msgID.String())
 		return s.consumer.Ack(msg)
 	}
 
