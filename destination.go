@@ -19,9 +19,6 @@ type Destination struct {
 }
 
 type DestinationConfig struct {
-	// Config includes parameters that are the same in the source and destination.
-	Config
-
 	URL   string `json:"URL" validate:"required"`
 	Topic string `json:"topic" validate:"required"`
 }

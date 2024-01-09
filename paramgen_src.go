@@ -17,21 +17,19 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 				sdk.ValidationRequired{},
 			},
 		},
-		"global_config_param_name": {
-			Default:     "",
-			Description: "global_config_param_name is named global_config_param_name and needs to be provided by the user.",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{
-				sdk.ValidationRequired{},
-			},
-		},
-		"subscription": {
+		"subscriptionName": {
 			Default:     "",
 			Description: "",
 			Type:        sdk.ParameterTypeString,
 			Validations: []sdk.Validation{
 				sdk.ValidationRequired{},
 			},
+		},
+		"subscriptionType": {
+			Default:     "",
+			Description: "",
+			Type:        sdk.ParameterTypeString,
+			Validations: []sdk.Validation{},
 		},
 		"topic": {
 			Default:     "",

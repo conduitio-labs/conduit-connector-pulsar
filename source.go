@@ -22,8 +22,6 @@ type Source struct {
 }
 
 type SourceConfig struct {
-	Config
-
 	URL              string           `json:"URL" validate:"required"`
 	Topic            string           `json:"topic" validate:"required"`
 	SubscriptionName string           `json:"subscriptionName" validate:"required"`
