@@ -134,6 +134,11 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	return nil
 }
 
+const (
+	// MetadataPulsarTopic is the metadata key for storing the pulsar topic
+	MetadataPulsarTopic = "pulsar.topic"
+)
+
 func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	msg, err := s.consumer.Receive(ctx)
 	if err != nil {
@@ -148,10 +153,11 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 
 	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Setting position for message")
 
-	// TODO: fill these up
-	var metadata sdk.Metadata
-	var key sdk.Data
-	var payload sdk.Data = sdk.RawData(msg.Payload())
+	metadata := sdk.Metadata{MetadataPulsarTopic: msg.Topic()}
+	metadata.SetCreatedAt(msg.EventTime())
+
+	key := sdk.RawData(msg.Key())
+	payload := sdk.RawData(msg.Payload())
 
 	return sdk.Util.Source.NewRecordCreate(
 		position,
