@@ -50,14 +50,14 @@ const (
 )
 
 func ParseSubscriptionType(s string) (SubscriptionType, bool) {
-	switch s {
-	case string(Exclusive):
+	switch SubscriptionType(s) {
+	case Exclusive:
 		return Exclusive, true
-	case string(Shared):
+	case Shared:
 		return Shared, true
-	case string(Failover):
+	case Failover:
 		return Failover, true
-	case string(KeyShared):
+	case KeyShared:
 		return KeyShared, true
 	default:
 		return "", false
