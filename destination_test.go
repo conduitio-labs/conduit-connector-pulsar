@@ -18,6 +18,7 @@ func TestTeardown_NoOpen(t *testing.T) {
 }
 
 func TestDestination_Integration(t *testing.T) {
+	healthcheck(t)
 	is := is.New(t)
 
 	con := apachepulsar.NewDestination()

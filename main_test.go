@@ -3,9 +3,7 @@ package apachepulsar_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 )
@@ -16,57 +14,36 @@ import (
 // health request ourselves.
 // Here the docs: https://pulsar.apache.org/admin-rest-api/#operation/BrokersBase_healthCheck
 
-func checkBrokersHealth() (ok bool, err error) {
+func areBrokersHealthy() bool {
 	timeout := time.Duration(5 * time.Second)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
 	req, err := http.NewRequestWithContext(ctx,
 		"GET", "http://localhost:8080/admin/v2/brokers/health", nil)
 	if err != nil {
-		return false, err
+		return false
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if errors.Is(err, context.DeadlineExceeded) {
-		// timeout, caller needs to retry
-		return false, nil
+		return false
 	} else if err != nil {
-		return false, fmt.Errorf("error while checking brokers health: %w", err)
+		return false
 	}
 
-	if res.StatusCode == 200 {
-		return true, nil
-	}
-	return false, nil
+	return res.StatusCode == 200
 }
 
-func healthcheck() error {
+func healthcheck(t *testing.T) {
 	for timesChecked := 0; timesChecked < 100; timesChecked++ {
-		ok, err := checkBrokersHealth()
-		if err != nil {
-			fmt.Println(err)
-			continue
-		} else if !ok {
+		if !areBrokersHealthy() {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
 
-		return nil
+		return
 	}
 
-	return errors.New("healthcheck failed, retry limit reached")
-}
-
-func TestMain(m *testing.M) {
-	for {
-		if err := healthcheck(); err != nil {
-			time.Sleep(1 * time.Second)
-			continue
-		}
-
-		break
-	}
-
-	code := m.Run()
-	os.Exit(code)
+	t.Errorf("healthcheck retry limit reached")
 }
