@@ -24,3 +24,9 @@
 
 ### OS ###
 .DS_Store
+
+
+### docker ###
+
+# Volumes from docker-compose
+test/data

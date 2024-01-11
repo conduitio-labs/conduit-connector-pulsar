@@ -18,6 +18,7 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 
 func TestSource_Integration(t *testing.T) {
 	is := is.New(t)
+
 	produceExampleMsg(is)
 
 	con := apachepulsar.NewSource()
