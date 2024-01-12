@@ -18,8 +18,6 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 }
 
 func TestSource_Integration(t *testing.T) {
-	healthcheck(t)
-
 	is := is.New(t)
 
 	topic := "source_test"
