@@ -140,6 +140,7 @@ const (
 )
 
 func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
+	sdk.Logger(ctx).Debug().Msg("reading message")
 	msg, err := s.consumer.Receive(ctx)
 	if err != nil {
 		return sdk.Record{}, fmt.Errorf("failed to receive message: %w", err)

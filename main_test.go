@@ -3,6 +3,7 @@ package apachepulsar_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -29,21 +30,24 @@ func areBrokersHealthy() bool {
 	if errors.Is(err, context.DeadlineExceeded) {
 		return false
 	} else if err != nil {
+		fmt.Println(err)
 		return false
 	}
+	defer res.Body.Close()
 
 	return res.StatusCode == 200
 }
 
 func healthcheck(t *testing.T) {
-	for timesChecked := 0; timesChecked < 100; timesChecked++ {
+	for timesChecked := 0; timesChecked < 5; timesChecked++ {
 		if !areBrokersHealthy() {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(1 * time.Second)
 			continue
 		}
 
+		<-time.After(10 * time.Second)
 		return
 	}
 
-	t.Errorf("healthcheck retry limit reached")
+	t.Fatal("healthcheck retry limit reached")
 }

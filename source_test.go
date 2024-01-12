@@ -3,6 +3,7 @@ package apachepulsar_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/apache/pulsar-client-go/pulsar"
@@ -21,25 +22,38 @@ func TestSource_Integration(t *testing.T) {
 
 	is := is.New(t)
 
-	produceExampleMsg(is)
+	topic := "source_test"
+
+	produceExampleMsg(is, topic)
+
+	t.Log("produced example message")
 
 	con := apachepulsar.NewSource()
 	ctx := context.Background()
 
 	err := con.Configure(ctx, map[string]string{
 		"URL":              "pulsar://localhost:6650",
-		"topic":            "source_test",
+		"topic":			topic,
 		"subscriptionName": "source_test",
 	})
 	is.NoErr(err)
 
+	t.Log("configured source")
+
 	err = con.Open(ctx, nil)
 	is.NoErr(err)
+
+	t.Log("opened source")
 
 	defer func() {
 		err := con.Teardown(ctx)
 		is.NoErr(err)
 	}()
+
+	t.Log("reading example message")
+
+	ctx, cancel := context.WithTimeout(ctx, 5 * time.Second)
+	defer cancel()
 
 	record, err := con.Read(ctx)
 	is.NoErr(err)
@@ -49,7 +63,7 @@ func TestSource_Integration(t *testing.T) {
 	is.NoErr(err)
 }
 
-func produceExampleMsg(is *is.I) {
+func produceExampleMsg(is *is.I, topic string) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL: "pulsar://localhost:6650",
 	})
@@ -58,7 +72,7 @@ func produceExampleMsg(is *is.I) {
 	defer client.Close()
 
 	producer, err := client.CreateProducer(pulsar.ProducerOptions{
-		Topic: "source_test",
+		Topic: topic,
 	})
 	is.NoErr(err)
 
