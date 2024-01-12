@@ -22,7 +22,7 @@ func TestSource_Integration(t *testing.T) {
 
 	topic := "source_test"
 
-	produceExampleMsg(is, topic)
+	go produceExampleMsg(is, topic)
 
 	t.Log("produced example message")
 

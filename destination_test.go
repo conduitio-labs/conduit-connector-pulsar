@@ -38,21 +38,8 @@ func TestDestination_Integration(t *testing.T) {
 		is.NoErr(err)
 	}()
 
-	_, err = con.Write(ctx, []sdk.Record{
-		{
-			Position:  []byte{},
-			Operation: 0,
-			Metadata:  map[string]string{},
-			Key:       nil,
-			Payload: sdk.Change{
-				Before: nil,
-				After:  sdk.RawData("example message"),
-			},
-		},
-	})
-	is.NoErr(err)
-
-	{ // consume the test message
+	go func () {
+		 // consume the test message
 		client, err := pulsar.NewClient(pulsar.ClientOptions{
 			URL: "pulsar://localhost:6650",
 		})
@@ -69,5 +56,19 @@ func TestDestination_Integration(t *testing.T) {
 		is.NoErr(err)
 
 		is.Equal(msg.Payload(), []byte("example message"))
-	}
+	}()
+
+	_, err = con.Write(ctx, []sdk.Record{
+		{
+			Position:  []byte{},
+			Operation: 0,
+			Metadata:  map[string]string{},
+			Key:       nil,
+			Payload: sdk.Change{
+				Before: nil,
+				After:  sdk.RawData("example message"),
+			},
+		},
+	})
+	is.NoErr(err)
 }
