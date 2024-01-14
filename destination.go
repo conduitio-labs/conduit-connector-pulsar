@@ -62,8 +62,11 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 	var written int
 	for _, record := range records {
 		sdk.Logger(ctx).Debug().Msgf("Writing record")
+		key := string(record.Key.Bytes())
+
 		_, err := d.producer.Send(ctx, &pulsar.ProducerMessage{
 			Payload: record.Payload.After.Bytes(),
+			Key:     key,
 		})
 		if err != nil {
 			return written, fmt.Errorf("failed to send message: %w", err)

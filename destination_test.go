@@ -2,13 +2,13 @@ package apachepulsar_test
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"testing"
 
 	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/apache/pulsar-client-go/pulsar"
 	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/google/uuid"
 	"github.com/matryer/is"
 )
 
@@ -22,73 +22,71 @@ func TestTeardown_NoOpen(t *testing.T) {
 func TestDestination_Integration(t *testing.T) {
 	is := is.New(t)
 
+	topic := "destination_test"
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
 
-		connectorDestinationWrite(is)
+		connectorDestinationWrite(is, topic)
 	}()
 
 	go func() {
 		defer wg.Done()
 
-		pulsarGoClientRead(is)
+		pulsarGoClientRead(is, topic)
 	}()
 
 	wg.Wait()
 }
 
-func connectorDestinationWrite(is *is.I) {
+var exampleMessage = "example message"
+
+func connectorDestinationWrite(is *is.I, topic string) {
 	con := apachepulsar.NewDestination()
 
 	ctx := context.Background()
 
 	err := con.Configure(ctx, map[string]string{
 		"URL":          "pulsar://localhost:6650",
-		"topic":        "destination_test",
-		"subscription": "destination_test",
+		"topic":        topic,
+		"subscription": topic,
 	})
 	is.NoErr(err)
 
 	err = con.Open(ctx)
 	is.NoErr(err)
 
-	_, err = con.Write(ctx, []sdk.Record{
-		{
-			Position:  []byte{},
-			Operation: 0,
-			Metadata:  map[string]string{},
-			Key:       nil,
-			Payload: sdk.Change{
-				Before: nil,
-				After:  sdk.RawData("example message"),
-			},
-		},
-	})
+	rec := sdk.Util.Source.NewRecordCreate(
+		[]byte(uuid.NewString()),
+		sdk.Metadata{"pulsar.topic": topic},
+		sdk.RawData("test-key"),
+		sdk.RawData(exampleMessage),
+	)
+	written, err := con.Write(ctx, []sdk.Record{rec})
 	is.NoErr(err)
+	is.Equal(written, 1)
 }
 
-func pulsarGoClientRead(is *is.I) {
+func pulsarGoClientRead(is *is.I, topic string) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL: "pulsar://localhost:6650",
 	})
 	is.NoErr(err)
 	defer client.Close()
 
-	fmt.Println("creating consumer")
-
 	consumer, err := client.Subscribe(pulsar.ConsumerOptions{
-		Topic:            "destination_test",
-		SubscriptionName: "destination_test",
+		Topic:            topic,
+		SubscriptionName: topic,
 	})
 	is.NoErr(err)
-
-	fmt.Println("receiving message")
 
 	msg, err := consumer.Receive(context.Background())
 	is.NoErr(err)
 
-	fmt.Println(string(msg.Payload()))
+	msgContents := string(msg.Payload())
+
+	is.Equal(msgContents, exampleMessage)
 }
