@@ -12,9 +12,9 @@ var version = "(devel)"
 func Specification() sdk.Specification {
 	return sdk.Specification{
 		Name:        "apachepulsar",
-		Summary:     "<describe your connector>",
-		Description: "<describe your connector in detail>",
+		Summary:     "An Apache Pulsar source and destination plugin for Conduit, written in Go.",
+		Description: "An Apache Pulsar source and destination plugin for Conduit, written in Go.",
 		Version:     version,
-		Author:      "<your name>",
+		Author:      "Meroxa, Inc.",
 	}
 }
