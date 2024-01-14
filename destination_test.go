@@ -90,3 +90,32 @@ func pulsarGoClientRead(is *is.I, topic string) {
 
 	is.Equal(msgContents, exampleMessage)
 }
+
+func TestDestinationConfiguration(t *testing.T) {
+	is := is.New(t)
+	ctx := context.Background()
+
+	{
+		con := apachepulsar.NewDestination()
+		err := con.Configure(ctx, map[string]string{})
+		is.True(err != nil)
+	}
+
+	{
+		con := apachepulsar.NewDestination()
+		err := con.Configure(ctx, map[string]string{
+			"URL":              "pulsar://localhost:6650",
+			"topic":            "",
+		})
+		is.True(err != nil)
+	}
+
+	{
+		con := apachepulsar.NewDestination()
+		err := con.Configure(ctx, map[string]string{
+			"URL":              "pulsar://localhost:6650",
+			"topic":            "test",
+		})
+		is.True(err == nil)
+	}
+}

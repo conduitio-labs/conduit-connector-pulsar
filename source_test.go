@@ -78,3 +78,34 @@ func pulsarGoClientWrite(is *is.I, topic string) {
 	is.NoErr(err)
 
 }
+
+func TestSourceConfiguration(t *testing.T) {
+	is := is.New(t)
+	ctx := context.Background()
+
+	{
+		con := apachepulsar.NewSource()
+		err := con.Configure(ctx, map[string]string{})
+		is.True(err != nil)
+	}
+
+	{
+		con := apachepulsar.NewSource()
+		err := con.Configure(ctx, map[string]string{
+			"URL":              "pulsar://localhost:6650",
+			"topic":            "",
+			"subscriptionName": "",
+		})
+		is.True(err != nil)
+	}
+
+	{
+		con := apachepulsar.NewSource()
+		err := con.Configure(ctx, map[string]string{
+			"URL":              "pulsar://localhost:6650",
+			"topic":            "test",
+			"subscriptionName": "test",
+		})
+		is.True(err == nil)
+	}
+}

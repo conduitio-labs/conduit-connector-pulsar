@@ -33,10 +33,17 @@ func (d *Destination) Parameters() map[string]sdk.Parameter {
 
 func (d *Destination) Configure(ctx context.Context, cfg map[string]string) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Destination...")
-	err := sdk.Util.ParseConfig(cfg, &d.config)
-	if err != nil {
+
+	validate := newConfigValidator(cfg)
+	validatedConfig := DestinationConfig{
+		URL:   validate.Required("URL"),
+		Topic: validate.Required("topic"),
+	}
+	d.config = validatedConfig
+	if err := validate.Error(); err != nil {
 		return fmt.Errorf("invalid config: %w", err)
 	}
+
 	return nil
 }
 
