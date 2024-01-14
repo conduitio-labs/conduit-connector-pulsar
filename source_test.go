@@ -2,8 +2,8 @@ package apachepulsar_test
 
 import (
 	"context"
+	"sync"
 	"testing"
-	"time"
 
 	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/apache/pulsar-client-go/pulsar"
@@ -21,6 +21,23 @@ func TestSource_Integration(t *testing.T) {
 	is := is.New(t)
 
 	topic := "source_test"
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		connectorSourceRead(is, topic)
+		wg.Done()
+	}()
+
+	go func() {
+		pulsarGoClientWrite(is, topic)
+		wg.Done()
+	}()
+
+	wg.Wait()
+}
+
+func connectorSourceRead(is *is.I, topic string) {
 	con := apachepulsar.NewSource()
 	ctx := context.Background()
 	err := con.Configure(ctx, map[string]string{
@@ -33,34 +50,14 @@ func TestSource_Integration(t *testing.T) {
 	err = con.Open(ctx, nil)
 	is.NoErr(err)
 
-	defer func() {
-		err := con.Teardown(ctx)
-		is.NoErr(err)
-	}()
-
-	readEndC := make(chan struct{})
-
-	go func() {
-		defer close(readEndC)
-
-		record, err := con.Read(ctx)
-		is.NoErr(err)
-		is.Equal(string(record.Payload.After.Bytes()), "example message")
-		err = con.Ack(ctx, record.Position)
-		is.NoErr(err)
-	}()
-
-	produceExampleMsg(is, topic)
-
-	select {
-	case <-readEndC:
-		// Message has been correctly read
-	case <-time.After(10 * time.Second):
-		t.Fatal("Test timed out waiting for message consumption")
-	}
+	record, err := con.Read(ctx)
+	is.NoErr(err)
+	is.Equal(string(record.Payload.After.Bytes()), "example message")
+	err = con.Ack(ctx, record.Position)
+	is.NoErr(err)
 }
 
-func produceExampleMsg(is *is.I, topic string) {
+func pulsarGoClientWrite(is *is.I, topic string) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL: "pulsar://localhost:6650",
 	})
@@ -79,4 +76,5 @@ func produceExampleMsg(is *is.I, topic string) {
 		Payload: []byte("example message"),
 	})
 	is.NoErr(err)
+
 }
