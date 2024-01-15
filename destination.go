@@ -1,7 +1,5 @@
 package apachepulsar
 
-//go:generate paramgen -output=paramgen_dest.go DestinationConfig
-
 import (
 	"context"
 	"fmt"
@@ -18,11 +16,6 @@ type Destination struct {
 	config DestinationConfig
 }
 
-type DestinationConfig struct {
-	URL   string `json:"URL" validate:"required"`
-	Topic string `json:"topic" validate:"required"`
-}
-
 func NewDestination() sdk.Destination {
 	return sdk.DestinationWithMiddleware(&Destination{}, sdk.DefaultDestinationMiddleware()...)
 }
@@ -34,16 +27,12 @@ func (d *Destination) Parameters() map[string]sdk.Parameter {
 func (d *Destination) Configure(ctx context.Context, cfg map[string]string) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Destination...")
 
-	validate := newConfigValidator(cfg)
-	validatedConfig := DestinationConfig{
-		URL:   validate.Required("URL"),
-		Topic: validate.Required("topic"),
-	}
-	d.config = validatedConfig
-	if err := validate.Error(); err != nil {
-		return fmt.Errorf("invalid config: %w", err)
+	parsed, err := parseDestinationConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
+	d.config = parsed
 	return nil
 }
 

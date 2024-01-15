@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/apache/pulsar-client-go v0.11.1
 	github.com/conduitio/conduit-connector-sdk v0.8.0
+	github.com/google/uuid v1.4.0
 	github.com/matryer/is v1.4.1
 )
 
@@ -29,7 +30,6 @@ require (
 	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/google/uuid v1.4.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/hashicorp/go-hclog v0.14.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.3 // indirect

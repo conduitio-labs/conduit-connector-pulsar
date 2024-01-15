@@ -21,64 +21,6 @@ type Source struct {
 	config SourceConfig
 }
 
-type SourceConfig struct {
-	URL              string           `json:"URL" validate:"required"`
-	Topic            string           `json:"topic" validate:"required"`
-	SubscriptionName string           `json:"subscriptionName" validate:"required"`
-	SubscriptionType SubscriptionType `json:"subscriptionType"`
-}
-
-type SubscriptionType string
-
-const (
-	// Exclusive there can be only 1 consumer on the same topic with the same subscription name
-	Exclusive SubscriptionType = "exclusive"
-
-	// Shared subscription mode, multiple consumer will be able to use the same subscription name
-	// and the messages will be dispatched according to
-	// a round-robin rotation between the connected consumers
-	Shared SubscriptionType = "shared"
-
-	// Failover subscription mode, multiple consumer will be able to use the same subscription name
-	// but only 1 consumer will receive the messages.
-	// If that consumer disconnects, one of the other connected consumers will start receiving messages.
-	Failover SubscriptionType = "failover"
-
-	// KeyShared subscription mode, multiple consumer will be able to use the same
-	// subscription and all messages with the same key will be dispatched to only one consumer
-	KeyShared SubscriptionType = "key_shared"
-)
-
-func ParseSubscriptionType(s string) (SubscriptionType, bool) {
-	switch SubscriptionType(s) {
-	case Exclusive:
-		return Exclusive, true
-	case Shared:
-		return Shared, true
-	case Failover:
-		return Failover, true
-	case KeyShared:
-		return KeyShared, true
-	default:
-		return "", false
-	}
-}
-
-func (s SubscriptionType) PulsarType() pulsar.SubscriptionType {
-	switch s {
-	case Exclusive:
-		return pulsar.Exclusive
-	case Shared:
-		return pulsar.Shared
-	case Failover:
-		return pulsar.Failover
-	case KeyShared:
-		return pulsar.KeyShared
-	default:
-		return pulsar.Exclusive
-	}
-}
-
 func NewSource() sdk.Source {
 	source := &Source{
 		mx:       &sync.Mutex{},
@@ -95,26 +37,12 @@ func (s *Source) Parameters() map[string]sdk.Parameter {
 func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Source...")
 
-	validate := newConfigValidator(cfg)
-
-	validatedConfig := SourceConfig{
-		URL:              validate.Required("URL"),
-		Topic:            validate.Required("topic"),
-		SubscriptionName: validate.Required("subscriptionName"),
-	}
-	s.config = validatedConfig
-	if err := validate.Error(); err != nil {
-		return fmt.Errorf("invalid config: %w", err)
+	parsed, err := parseSourceConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	if stype, ok := cfg["subscriptionType"]; ok {
-		subscriptionType, ok := ParseSubscriptionType(stype)
-		if !ok {
-			return fmt.Errorf("invalid subscriptionType: %s", stype)
-		}
-
-		s.config.SubscriptionType = subscriptionType
-	}
+	s.config = parsed
 
 	return nil
 }
@@ -127,12 +55,11 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 
-	subscriptionType := s.config.SubscriptionType.PulsarType()
-
+	pulsarType := s.config.SubscriptionType.ToPulsar()
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
 		SubscriptionName: s.config.SubscriptionName,
-		Type:             subscriptionType,
+		Type:             pulsarType,
 	})
 	if err != nil {
 		client.Close()
