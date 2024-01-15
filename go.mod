@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/apache/pulsar-client-go v0.11.1
 	github.com/conduitio/conduit-connector-sdk v0.8.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/matryer/is v1.4.1
 )
 
