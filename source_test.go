@@ -58,17 +58,17 @@ func TestSource_Integration_RestartPartial(t *testing.T) {
 	recs2 := generatePulsarMsgs(4, 6)
 	go producePulsarMsgs(is, topic, recs2)
 
-	var wantRecs []pulsar.ProducerMessage
+	var wantRecs []*pulsar.ProducerMessage
 	wantRecs = append(wantRecs, recs1[1:]...)
 	wantRecs = append(wantRecs, recs2...)
 	testSourceIntegrationRead(is, cfgMap, lastPosition, wantRecs, false)
 }
 
-func generatePulsarMsgs(from, to int) []pulsar.ProducerMessage {
-	var msgs []pulsar.ProducerMessage
+func generatePulsarMsgs(from, to int) []*pulsar.ProducerMessage {
+	var msgs []*pulsar.ProducerMessage
 
 	for i := from; i <= to; i++ {
-		msgs = append(msgs, pulsar.ProducerMessage{
+		msgs = append(msgs, &pulsar.ProducerMessage{
 			Key:     fmt.Sprintf("test-key-%d", i),
 			Payload: []byte(fmt.Sprintf("test-key-%d", i)),
 		})
@@ -77,7 +77,7 @@ func generatePulsarMsgs(from, to int) []pulsar.ProducerMessage {
 	return msgs
 }
 
-func producePulsarMsgs(is *is.I, topic string, msgs []pulsar.ProducerMessage) {
+func producePulsarMsgs(is *is.I, topic string, msgs []*pulsar.ProducerMessage) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL: "pulsar://localhost:6650",
 	})
@@ -91,7 +91,7 @@ func producePulsarMsgs(is *is.I, topic string, msgs []pulsar.ProducerMessage) {
 	defer producer.Close()
 
 	for _, msg := range msgs {
-		_, err = producer.Send(context.Background(), &msg)
+		_, err = producer.Send(context.Background(), msg)
 		is.NoErr(err)
 	}
 }
@@ -103,7 +103,7 @@ func testSourceIntegrationRead(
 	is *is.I,
 	cfgMap map[string]string,
 	startFrom sdk.Position,
-	wantRecords []pulsar.ProducerMessage,
+	wantRecords []*pulsar.ProducerMessage,
 	ackFirstOnly bool,
 ) sdk.Position {
 	ctx := context.Background()
