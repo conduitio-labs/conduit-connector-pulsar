@@ -43,7 +43,7 @@ type SourceConfig struct {
 	SubscriptionName string `json:"subscriptionName" validate:"required"`
 
 	// SubscriptionType defines the type of subscription to use. This can be
-	// either "exclusive", "shared", "failover" or "keyshared".
+	// either "exclusive", "shared", "failover" or "keyshared". The default value is "exclusive".
 	//
 	// With "exclusive" there can be only 1 consumer on the same topic with the same subscription name
 	//
@@ -67,9 +67,13 @@ var subscriptionTypes = map[string]pulsar.SubscriptionType{
 	"key_shared": pulsar.KeyShared,
 }
 
-func parseSubscriptionType(s string) (pulsar.SubscriptionType, bool) {
+func parseSubscriptionType(s string) pulsar.SubscriptionType {
 	subscriptionType, ok := subscriptionTypes[s]
-	return subscriptionType, ok
+	if !ok {
+		return pulsar.Exclusive
+	}
+
+	return subscriptionType
 }
 
 type DestinationConfig struct {

@@ -52,15 +52,12 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 
-	pulsarType, ok := parseSubscriptionType(s.config.SubscriptionType)
-	if !ok {
-		return fmt.Errorf("invalid subscription type: %s", s.config.SubscriptionType)
-	}
+	subscriptionType := parseSubscriptionType(s.config.SubscriptionType)
 
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
 		SubscriptionName: s.config.SubscriptionName,
-		Type:             pulsarType,
+		Type:             subscriptionType,
 	})
 	if err != nil {
 		client.Close()
