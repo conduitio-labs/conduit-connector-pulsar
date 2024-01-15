@@ -1,4 +1,4 @@
-package apachepulsar
+package pulsar
 
 import (
 	"context"
@@ -27,12 +27,10 @@ func (d *Destination) Parameters() map[string]sdk.Parameter {
 func (d *Destination) Configure(ctx context.Context, cfg map[string]string) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Destination...")
 
-	parsed, err := parseDestinationConfig(cfg)
-	if err != nil {
+	if err := sdk.Util.ParseConfig(cfg, &d.config); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	d.config = parsed
 	return nil
 }
 
@@ -61,7 +59,7 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 		key := string(record.Key.Bytes())
 
 		_, err := d.producer.Send(ctx, &pulsar.ProducerMessage{
-			Payload: record.Payload.After.Bytes(),
+			Payload: record.Bytes(),
 			Key:     key,
 		})
 		if err != nil {

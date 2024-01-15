@@ -1,4 +1,4 @@
-package apachepulsar
+package pulsar
 
 import (
 	"time"
@@ -32,19 +32,6 @@ type Config struct {
 	EnableTransaction bool `json:"enableTransaction"`
 }
 
-func parseConfig(validate *configValidator, cfg map[string]string) Config {
-	config := Config{
-		URL:                     validate.RequiredStr("URL"),
-		ConnectionTimeout:       validate.OptionalDuration("connectionTimeout"),
-		OperationTimeout:        validate.OptionalDuration("operationTimeout"),
-		MaxConnectionsPerBroker: validate.OptionalInt("maxConnectionsPerBroker"),
-		MemoryLimitBytes:        validate.OptionalInt("maxConnectionsPerBroker"),
-		EnableTransaction:       validate.OptionalBool("enableTransaction"),
-	}
-
-	return config
-}
-
 type SourceConfig struct {
 	Config
 
@@ -57,75 +44,32 @@ type SourceConfig struct {
 
 	// SubscriptionType defines the type of subscription to use. This can be
 	// either "exclusive", "shared", "failover" or "keyshared".
-	SubscriptionType SubscriptionType `json:"subscriptionType"`
-}
-
-func parseSourceConfig(cfg map[string]string) (SourceConfig, error) {
-	validate := newConfigValidator(cfg)
-
-	sharedConfig := parseConfig(validate, cfg)
-
-	config := SourceConfig{
-		Config:           sharedConfig,
-		Topic:            validate.RequiredStr("topic"),
-		SubscriptionName: validate.RequiredStr("subscriptionName"),
-		SubscriptionType: parseSubscriptionType(validate, "subscriptionType"),
-	}
-
-	return config, validate.Error()
-}
-
-// SubscriptionType is the type of subscription to create. Mapped directly from
-// pulsar.SubscriptionType
-type SubscriptionType string
-
-const (
-	// Exclusive there can be only 1 consumer on the same topic with the same subscription name
-	Exclusive SubscriptionType = "exclusive"
-
-	// Shared subscription mode, multiple consumer will be able to use the same subscription name
+	//
+	// With "exclusive" there can be only 1 consumer on the same topic with the same subscription name
+	//
+	// With "shared" subscription mode, multiple consumer will be able to use the same subscription name
 	// and the messages will be dispatched according to
 	// a round-robin rotation between the connected consumers
-	Shared SubscriptionType = "shared"
-
-	// Failover subscription mode, multiple consumer will be able to use the same subscription name
+	//
+	// With "failover" subscription mode, multiple consumer will be able to use the same subscription name
 	// but only 1 consumer will receive the messages.
 	// If that consumer disconnects, one of the other connected consumers will start receiving messages.
-	Failover SubscriptionType = "failover"
-
-	// KeyShared subscription mode, multiple consumer will be able to use the same
+	//
+	// With "key_shared" subscription mode, multiple consumer will be able to use the same
 	// subscription and all messages with the same key will be dispatched to only one consumer
-	KeyShared SubscriptionType = "key_shared"
-)
-
-func ParseSubscriptionType(s string) (SubscriptionType, bool) {
-	switch SubscriptionType(s) {
-	case Exclusive:
-		return Exclusive, true
-	case Shared:
-		return Shared, true
-	case Failover:
-		return Failover, true
-	case KeyShared:
-		return KeyShared, true
-	default:
-		return "", false
-	}
+	SubscriptionType string `json:"subscriptionType" validate:"inclusion=exclusive|shared|failover|key_shared"`
 }
 
-func (s SubscriptionType) ToPulsar() pulsar.SubscriptionType {
-	switch s {
-	case Exclusive:
-		return pulsar.Exclusive
-	case Shared:
-		return pulsar.Shared
-	case Failover:
-		return pulsar.Failover
-	case KeyShared:
-		return pulsar.KeyShared
-	default:
-		return pulsar.Exclusive
-	}
+var subscriptionTypes = map[string]pulsar.SubscriptionType{
+	"exclusive":  pulsar.Exclusive,
+	"shared":     pulsar.Shared,
+	"failover":   pulsar.Failover,
+	"key_shared": pulsar.KeyShared,
+}
+
+func parseSubscriptionType(s string) (pulsar.SubscriptionType, bool) {
+	subscriptionType, ok := subscriptionTypes[s]
+	return subscriptionType, ok
 }
 
 type DestinationConfig struct {
@@ -133,17 +77,4 @@ type DestinationConfig struct {
 
 	// Topic specifies the Pulsar topic to which the destination will produce messages.
 	Topic string `json:"topic" validate:"required"`
-}
-
-func parseDestinationConfig(cfg map[string]string) (DestinationConfig, error) {
-	validate := newConfigValidator(cfg)
-
-	sharedConfig := parseConfig(validate, cfg)
-
-	config := DestinationConfig{
-		Config: sharedConfig,
-		Topic:  validate.RequiredStr("topic"),
-	}
-
-	return config, validate.Error()
 }

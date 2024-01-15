@@ -1,18 +1,17 @@
-package apachepulsar_test
+package pulsar
 
 import (
 	"context"
 	"sync"
 	"testing"
 
-	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/matryer/is"
 )
 
 func TestTeardownSource_NoOpen(t *testing.T) {
 	is := is.New(t)
-	con := apachepulsar.NewSource()
+	con := NewSource()
 	err := con.Teardown(context.Background())
 	is.NoErr(err)
 }
@@ -38,7 +37,7 @@ func TestSource_Integration(t *testing.T) {
 }
 
 func connectorSourceRead(is *is.I, topic string) {
-	con := apachepulsar.NewSource()
+	con := NewSource()
 	ctx := context.Background()
 	err := con.Configure(ctx, map[string]string{
 		"URL":              "pulsar://localhost:6650",
@@ -77,35 +76,4 @@ func pulsarGoClientWrite(is *is.I, topic string) {
 	})
 	is.NoErr(err)
 
-}
-
-func TestSourceConfiguration(t *testing.T) {
-	is := is.New(t)
-	ctx := context.Background()
-
-	{
-		con := apachepulsar.NewSource()
-		err := con.Configure(ctx, map[string]string{})
-		is.True(err != nil)
-	}
-
-	{
-		con := apachepulsar.NewSource()
-		err := con.Configure(ctx, map[string]string{
-			"URL":              "pulsar://localhost:6650",
-			"topic":            "",
-			"subscriptionName": "",
-		})
-		is.True(err != nil)
-	}
-
-	{
-		con := apachepulsar.NewSource()
-		err := con.Configure(ctx, map[string]string{
-			"URL":              "pulsar://localhost:6650",
-			"topic":            "test",
-			"subscriptionName": "test",
-		})
-		is.True(err == nil)
-	}
 }

@@ -1,4 +1,4 @@
-package apachepulsar
+package pulsar
 
 //go:generate paramgen -output=paramgen_src.go SourceConfig
 
@@ -37,12 +37,9 @@ func (s *Source) Parameters() map[string]sdk.Parameter {
 func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Source...")
 
-	parsed, err := parseSourceConfig(cfg)
-	if err != nil {
+	if err := sdk.Util.ParseConfig(cfg, &s.config); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
-
-	s.config = parsed
 
 	return nil
 }
@@ -55,7 +52,11 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 
-	pulsarType := s.config.SubscriptionType.ToPulsar()
+	pulsarType, ok := parseSubscriptionType(s.config.SubscriptionType)
+	if !ok {
+		return fmt.Errorf("invalid subscription type: %s", s.config.SubscriptionType)
+	}
+
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
 		SubscriptionName: s.config.SubscriptionName,

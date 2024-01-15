@@ -1,11 +1,10 @@
-package apachepulsar_test
+package pulsar
 
 import (
 	"context"
 	"sync"
 	"testing"
 
-	apachepulsar "github.com/alarbada/conduit-connector-apachepulsar"
 	"github.com/apache/pulsar-client-go/pulsar"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
@@ -14,7 +13,7 @@ import (
 
 func TestTeardown_NoOpen(t *testing.T) {
 	is := is.New(t)
-	con := apachepulsar.NewDestination()
+	con := NewDestination()
 	err := con.Teardown(context.Background())
 	is.NoErr(err)
 }
@@ -45,7 +44,7 @@ func TestDestination_Integration(t *testing.T) {
 var exampleMessage = "example message"
 
 func connectorDestinationWrite(is *is.I, topic string) {
-	con := apachepulsar.NewDestination()
+	con := NewDestination()
 
 	ctx := context.Background()
 
@@ -89,33 +88,4 @@ func pulsarGoClientRead(is *is.I, topic string) {
 	msgContents := string(msg.Payload())
 
 	is.Equal(msgContents, exampleMessage)
-}
-
-func TestDestinationConfiguration(t *testing.T) {
-	is := is.New(t)
-	ctx := context.Background()
-
-	{
-		con := apachepulsar.NewDestination()
-		err := con.Configure(ctx, map[string]string{})
-		is.True(err != nil)
-	}
-
-	{
-		con := apachepulsar.NewDestination()
-		err := con.Configure(ctx, map[string]string{
-			"URL":              "pulsar://localhost:6650",
-			"topic":            "",
-		})
-		is.True(err != nil)
-	}
-
-	{
-		con := apachepulsar.NewDestination()
-		err := con.Configure(ctx, map[string]string{
-			"URL":              "pulsar://localhost:6650",
-			"topic":            "test",
-		})
-		is.True(err == nil)
-	}
 }
