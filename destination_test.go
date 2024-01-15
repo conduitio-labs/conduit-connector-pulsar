@@ -2,6 +2,7 @@ package pulsar
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"testing"
 
@@ -64,6 +65,7 @@ func connectorDestinationWrite(is *is.I, topic string) {
 		sdk.RawData("test-key"),
 		sdk.RawData(exampleMessage),
 	)
+
 	written, err := con.Write(ctx, []sdk.Record{rec})
 	is.NoErr(err)
 	is.Equal(written, 1)
@@ -85,7 +87,14 @@ func pulsarGoClientRead(is *is.I, topic string) {
 	msg, err := consumer.Receive(context.Background())
 	is.NoErr(err)
 
-	msgContents := string(msg.Payload())
+	var received struct {
+		Payload struct {
+			After sdk.RawData `json:"after"`
+		} `json:"payload"`
+	}
+	err = json.Unmarshal(msg.Payload(), &received)
+	is.NoErr(err)
 
-	is.Equal(msgContents, exampleMessage)
+	receivedMsg := string(received.Payload.After.Bytes())
+	is.Equal(receivedMsg, exampleMessage)
 }
