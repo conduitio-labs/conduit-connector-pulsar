@@ -15,12 +15,17 @@ A source connector pulls data from an external resource and pushes it to downstr
 
 ### Configuration
 
-| name                  | description                           | required | default value |
-|-----------------------|---------------------------------------|----------|---------------|
-| `URL`                 | The service URL for the Pulsar service                            | true     |           |
-| `topic`               | Topic specifies the topic the consumer will subscribe on          | true     |           |
-| `subscriptionName`    | SubscriptionName specifies the subscription name for the consumer | true     |           |
-| `subscriptionType`    | SubscriptionType specifies the subscription type to be used when subscribing to a topic. | false     | exclusive |
+| name                     | description                                                                                                                           | required | default value |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
+| `URL`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
+| `topic`                  | topic specifies the Pulsar topic from which the source will consume messages.                                                        | true     |               |
+| `connectionTimeout`      | connectionTimeout specifies the duration for which the client will attempt to establish a connection before timing out.              | false    |               |
+| `enableTransaction`      | enableTransaction determines if the client should support transactions.                                                               | false    |               |
+| `maxConnectionsPerBroker`| maxConnectionsPerBroker limits the number of connections to each broker.                                                              | false    |               |
+| `memoryLimitBytes`       | memoryLimitBytes sets the memory limit for the client in bytes. If the limit is exceeded, the client may start to block or fail operations. | false    |               |
+| `operationTimeout`       | operationTimeout is the duration after which an operation is considered to have timed out.                                            | false    |               |
+| `subscriptionName`       | subscriptionName is the name of the subscription to be used for consuming messages.                                                   | true     |               |
+| `subscriptionType`       | subscriptionType defines the type of subscription to use. Can be "exclusive", "shared", "failover", "key_shared". Default is "exclusive". | false    | exclusive     |
 
 
 ## Destination
@@ -28,8 +33,12 @@ A destination connector pushes data from upstream resources to an external resou
 
 ### Configuration
 
-| name                  | description                           | required | default value |
-|-----------------------|---------------------------------------|----------|---------------|
-| `URL`             | The service URL for the Pulsar service                            | true     |           |
-| `topic`           | Topic specifies the topic the producer will be publishing on      | true     |           |
-
+| name                     | description                                                                                                                           | required | default value |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
+| `URL`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
+| `topic`                  | topic specifies the Pulsar topic to which the destination will produce messages.                                                      | true     |               |
+| `connectionTimeout`      | connectionTimeout specifies the duration for which the client will attempt to establish a connection before timing out.              | false    |               |
+| `enableTransaction`      | enableTransaction determines if the client should support transactions.                                                               | false    |               |
+| `maxConnectionsPerBroker`| maxConnectionsPerBroker limits the number of connections to each broker.                                                              | false    |               |
+| `memoryLimitBytes`       | memoryLimitBytes sets the memory limit for the client in bytes. If the limit is exceeded, the client may start to block or fail operations. | false    |               |
+| `operationTimeout`       | operationTimeout is the duration after which an operation is considered to have timed out.                                            | false    |               |
