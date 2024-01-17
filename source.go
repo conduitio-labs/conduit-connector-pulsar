@@ -17,8 +17,7 @@ type Source struct {
 	consumer pulsar.Consumer
 	received map[string]pulsar.Message
 	mx       *sync.Mutex
-
-	config SourceConfig
+	config   SourceConfig
 }
 
 func NewSource() sdk.Source {
@@ -44,7 +43,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
+func (s *Source) Open(_ context.Context, pos sdk.Position) error {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL:                     s.config.URL,
 		ConnectionTimeout:       s.config.ConnectionTimeout,
@@ -67,6 +66,22 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	if err != nil {
 		client.Close()
 		return fmt.Errorf("failed to create consumer: %w", err)
+	}
+
+	if pos != nil {
+		messageID, err := pulsar.DeserializeMessageID(pos)
+		if err != nil {
+			return fmt.Errorf(
+				"failed to deserialize message ID while trying to seek the given position %s: %w",
+				string(pos), err,
+			)
+		}
+		if err := s.consumer.Seek(messageID); err != nil {
+			return fmt.Errorf(
+				"failed to seek to the given position %s: %w",
+				string(pos), err,
+			)
+		}
 	}
 
 	return nil
@@ -125,7 +140,7 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 	return fmt.Errorf("message not found for position: %s", string(position))
 }
 
-func (s *Source) Teardown(ctx context.Context) error {
+func (s *Source) Teardown(_ context.Context) error {
 	if s.consumer != nil {
 		s.consumer.Close()
 	}
