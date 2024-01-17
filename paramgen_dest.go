@@ -9,14 +9,6 @@ import (
 
 func (DestinationConfig) Parameters() map[string]sdk.Parameter {
 	return map[string]sdk.Parameter{
-		"URL": {
-			Default:     "",
-			Description: "URL of the Pulsar instance to connect to.",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{
-				sdk.ValidationRequired{},
-			},
-		},
 		"connectionTimeout": {
 			Default:     "",
 			Description: "connectionTimeout specifies the duration for which the client will attempt to establish a connection before timing out.",
@@ -50,6 +42,14 @@ func (DestinationConfig) Parameters() map[string]sdk.Parameter {
 		"topic": {
 			Default:     "",
 			Description: "topic specifies the Pulsar topic to which the destination will produce messages.",
+			Type:        sdk.ParameterTypeString,
+			Validations: []sdk.Validation{
+				sdk.ValidationRequired{},
+			},
+		},
+		"url": {
+			Default:     "",
+			Description: "url of the Pulsar instance to connect to.",
 			Type:        sdk.ParameterTypeString,
 			Validations: []sdk.Validation{
 				sdk.ValidationRequired{},

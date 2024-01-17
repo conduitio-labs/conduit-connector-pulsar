@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	// URL of the Pulsar instance to connect to.
-	URL string `json:"URL" validate:"required"`
+	URL string `json:"url" validate:"required"`
 
 	// ConnectionTimeout specifies the duration for which the client will
 	// attempt to establish a connection before timing out.
@@ -26,7 +26,7 @@ type Config struct {
 
 	// MemoryLimitBytes sets the memory limit for the client in bytes.
 	// If the limit is exceeded, the client may start to block or fail operations.
-	MemoryLimitBytes int `json:"memoryLimitBytes"`
+	MemoryLimitBytes int64 `json:"memoryLimitBytes"`
 
 	// EnableTransaction determines if the client should support transactions.
 	EnableTransaction bool `json:"enableTransaction"`

@@ -17,7 +17,7 @@ A source connector pulls data from an external resource and pushes it to downstr
 
 | name                     | description                                                                                                                           | required | default value |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
-| `URL`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
+| `url`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
 | `topic`                  | topic specifies the Pulsar topic from which the source will consume messages.                                                        | true     |               |
 | `connectionTimeout`      | connectionTimeout specifies the duration for which the client will attempt to establish a connection before timing out.              | false    |               |
 | `enableTransaction`      | enableTransaction determines if the client should support transactions.                                                               | false    |               |
