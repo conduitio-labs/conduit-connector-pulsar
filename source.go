@@ -46,7 +46,12 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 
 func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: s.config.URL,
+		URL:                     s.config.URL,
+		ConnectionTimeout:       s.config.ConnectionTimeout,
+		OperationTimeout:        s.config.OperationTimeout,
+		MaxConnectionsPerBroker: s.config.MaxConnectionsPerBroker,
+		MemoryLimitBytes:        s.config.MemoryLimitBytes,
+		EnableTransaction:       s.config.EnableTransaction,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)
