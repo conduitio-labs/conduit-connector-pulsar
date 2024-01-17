@@ -20,3 +20,6 @@ generate:
 
 install-paramgen:
 	go install github.com/conduitio/conduit-connector-sdk/cmd/paramgen@latest
+
+lint:
+	golangci-lint run
