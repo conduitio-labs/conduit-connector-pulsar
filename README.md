@@ -35,7 +35,7 @@ A destination connector pushes data from upstream resources to an external resou
 
 | name                     | description                                                                                                                           | required | default value |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
-| `URL`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
+| `url`                    | URL of the Pulsar instance to connect to.                                                                                             | true     |               |
 | `topic`                  | topic specifies the Pulsar topic to which the destination will produce messages.                                                      | true     |               |
 | `connectionTimeout`      | connectionTimeout specifies the duration for which the client will attempt to establish a connection before timing out.              | false    |               |
 | `enableTransaction`      | enableTransaction determines if the client should support transactions.                                                               | false    |               |
