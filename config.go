@@ -44,6 +44,21 @@ type Config struct {
 
 	// EnableTransaction determines if the client should support transactions.
 	EnableTransaction bool `json:"enableTransaction"`
+
+	// TLSKeyFilePath sets the path to the TLS key file
+	TLSKeyFilePath string `json:"tlsKeyFilePath"`
+
+	// TLSCertificateFile sets the path to the TLS certificate file
+	TLSCertificateFile string `json:"tlsCertificateFile"`
+
+	// TLSTrustCertsFilePath sets the path to the trusted TLS certificate file
+	TLSTrustCertsFilePath string `json:"tlsTrustCertsFilePath"`
+
+	// TLSAllowInsecureConnection configures whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)
+	TLSAllowInsecureConnection bool `json:"tlsAllowInsecureConnection"`
+
+	// TLSValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)
+	TLSValidateHostname bool `json:"tlsValidateHostname"`
 }
 
 type SourceConfig struct {
