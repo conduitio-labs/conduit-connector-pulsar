@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/apache/pulsar-client-go/pulsar"
+	"github.com/apache/pulsar-client-go/pulsar/log"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 )
 
@@ -58,6 +59,11 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 }
 
 func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
+	var logger log.Logger = nil
+	if s.config.DisableLogging {
+		logger = log.DefaultNopLogger()
+	}
+
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL:                        s.config.URL,
 		ConnectionTimeout:          s.config.ConnectionTimeout,
@@ -70,6 +76,8 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		TLSTrustCertsFilePath:      s.config.TLSTrustCertsFilePath,
 		TLSAllowInsecureConnection: s.config.TLSAllowInsecureConnection,
 		TLSValidateHostname:        s.config.TLSValidateHostname,
+
+		Logger: logger,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)

@@ -59,6 +59,9 @@ type Config struct {
 
 	// TLSValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)
 	TLSValidateHostname bool `json:"tlsValidateHostname"`
+
+	// disableLogging is for internal use only
+	DisableLogging bool `json:"disableLogging"`
 }
 
 type SourceConfig struct {
