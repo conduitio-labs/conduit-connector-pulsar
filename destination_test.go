@@ -36,7 +36,7 @@ func TestTeardown_NoOpen(t *testing.T) {
 func TestDestination_Integration(t *testing.T) {
 	is := is.New(t)
 
-	topic := "destination_test"
+	topic := setupTopicName(t, is)
 
 	var wg sync.WaitGroup
 	wg.Add(2)

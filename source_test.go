@@ -17,6 +17,7 @@ package pulsar
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/apache/pulsar-client-go/pulsar"
@@ -35,9 +36,10 @@ func TestSource_Integration_RestartFull(t *testing.T) {
 	t.Parallel()
 	is := is.New(t)
 
-	topic := "pulsar.topic." + t.Name()
+	topic := setupTopicName(t, is)
+
 	cfgMap := map[string]string{
-		"URL":              "pulsar://localhost:6650",
+		"url":              "pulsar://localhost:6650",
 		"topic":            topic,
 		"subscriptionName": topic + "-subscription",
 	}
@@ -55,9 +57,10 @@ func TestSource_Integration_RestartPartial(t *testing.T) {
 	t.Parallel()
 	is := is.New(t)
 
-	topic := "pulsar.topic." + t.Name()
+	topic := setupTopicName(t, is)
+
 	cfgMap := map[string]string{
-		"URL":              "pulsar://localhost:6650",
+		"url":              "pulsar://localhost:6650",
 		"topic":            topic,
 		"subscriptionName": topic + "-subscription",
 	}
@@ -151,4 +154,33 @@ func testSourceIntegrationRead(
 	}
 
 	return positions[len(positions)-1]
+}
+
+// setupTopicName creates a new topic name for the test and deletes it if it
+// exists, so that the test can start from a clean slate.
+func setupTopicName(t *testing.T, is *is.I) string {
+	topic := "pulsar.topic." + t.Name()
+	deletePulsarTopic(is, topic)
+
+	return topic
+}
+
+func deletePulsarTopic(is *is.I, topic string) {
+	url := fmt.Sprintf(
+		"http://localhost:8080/admin/v2/persistent/public/default/%s?force=true",
+		topic)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	is.NoErr(err)
+
+	res, err := http.DefaultClient.Do(req)
+	is.NoErr(err)
+	defer res.Body.Close()
+
+	// topic not found, nothing to delete
+	if res.StatusCode == http.StatusNotFound {
+		return
+	}
+
+	is.Equal(res.StatusCode, http.StatusNoContent)
 }
