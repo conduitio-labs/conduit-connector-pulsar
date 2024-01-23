@@ -57,7 +57,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(_ context.Context, pos sdk.Position) error {
+func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
 		URL:                        s.config.URL,
 		ConnectionTimeout:          s.config.ConnectionTimeout,
@@ -98,6 +98,15 @@ func (s *Source) Open(_ context.Context, pos sdk.Position) error {
 		if err := s.consumer.Seek(messageID); err != nil {
 			return fmt.Errorf(
 				"failed to seek to the given position %s: %w",
+				string(pos), err,
+			)
+		}
+
+		// advance one message, as seek is inclusive
+		_, err = s.consumer.Receive(ctx)
+		if err != nil {
+			return fmt.Errorf(
+				"failed to receive message after seeking to the given position %s: %w",
 				string(pos), err,
 			)
 		}

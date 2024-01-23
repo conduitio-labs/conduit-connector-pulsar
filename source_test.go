@@ -87,7 +87,7 @@ func generatePulsarMsgs(from, to int) []*pulsar.ProducerMessage {
 	for i := from; i <= to; i++ {
 		msgs = append(msgs, &pulsar.ProducerMessage{
 			Key:     fmt.Sprintf("test-key-%d", i),
-			Payload: []byte(fmt.Sprintf("test-key-%d", i)),
+			Payload: []byte(fmt.Sprintf("test-payload-%d", i)),
 		})
 	}
 
