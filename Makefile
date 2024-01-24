@@ -25,3 +25,9 @@ install-paramgen:
 lint:
 	golangci-lint run
 
+
+up:
+	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
+
+down:
+	docker compose -f test/docker-compose.yml down

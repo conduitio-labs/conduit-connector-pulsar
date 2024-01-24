@@ -83,12 +83,10 @@ func (s *Source) Open(_ context.Context, _ sdk.Position) error {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 
-	subscriptionType := parseSubscriptionType(s.config.SubscriptionType)
-
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
 		SubscriptionName: s.config.SubscriptionName,
-		Type:             subscriptionType,
+		Type:             pulsar.Shared,
 	})
 	if err != nil {
 		client.Close()

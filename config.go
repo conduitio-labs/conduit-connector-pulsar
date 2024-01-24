@@ -73,23 +73,6 @@ type SourceConfig struct {
 	// SubscriptionName is the name of the subscription to be used for
 	// consuming messages.
 	SubscriptionName string `json:"subscriptionName" validate:"required"`
-
-	// SubscriptionType defines the type of subscription to use. This can be
-	// either "exclusive", "shared", "failover" or "keyshared". The default value is "exclusive".
-	//
-	// With "exclusive" there can be only 1 consumer on the same topic with the same subscription name
-	//
-	// With "shared" subscription mode, multiple consumer will be able to use the same subscription name
-	// and the messages will be dispatched according to
-	// a round-robin rotation between the connected consumers
-	//
-	// With "failover" subscription mode, multiple consumer will be able to use the same subscription name
-	// but only 1 consumer will receive the messages.
-	// If that consumer disconnects, one of the other connected consumers will start receiving messages.
-	//
-	// With "key_shared" subscription mode, multiple consumer will be able to use the same
-	// subscription and all messages with the same key will be dispatched to only one consumer
-	SubscriptionType string `json:"subscriptionType" validate:"inclusion=exclusive|shared|failover|key_shared"`
 }
 
 var subscriptionTypes = map[string]pulsar.SubscriptionType{
