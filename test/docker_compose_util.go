@@ -35,12 +35,12 @@ const (
 // exists, so that the test can start from a clean slate.
 func SetupTopicName(t *testing.T, is *is.I) string {
 	topic := "pulsar.topic." + t.Name()
-	deletePulsarTopic(is, topic)
+	DeletePulsarTopic(is, topic)
 
 	return topic
 }
 
-func deletePulsarTopic(is *is.I, topic string) {
+func DeletePulsarTopic(is *is.I, topic string) {
 	serverURLs := []string{
 		"http://127.0.0.1:8080",
 		"http://127.0.0.1:8081",
