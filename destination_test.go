@@ -20,6 +20,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/alarbada/conduit-connector-apache-pulsar/test"
 	"github.com/apache/pulsar-client-go/pulsar"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
@@ -36,7 +37,7 @@ func TestTeardown_NoOpen(t *testing.T) {
 func TestDestination_Integration(t *testing.T) {
 	is := is.New(t)
 
-	topic := setupTopicName(t, is)
+	topic := test.SetupTopicName(t, is)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -64,7 +65,7 @@ func connectorDestinationWrite(is *is.I, topic string) {
 	ctx := context.Background()
 
 	err := con.Configure(ctx, map[string]string{
-		"URL":          "pulsar://localhost:6650",
+		"URL":          test.PulsarURL,
 		"topic":        topic,
 		"subscription": topic,
 	})
@@ -87,7 +88,7 @@ func connectorDestinationWrite(is *is.I, topic string) {
 
 func pulsarGoClientRead(is *is.I, topic string) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: "pulsar://localhost:6650",
+		URL: test.PulsarURL,
 	})
 	is.NoErr(err)
 	defer client.Close()

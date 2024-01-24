@@ -15,6 +15,12 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 			Type:        sdk.ParameterTypeDuration,
 			Validations: []sdk.Validation{},
 		},
+		"disableLogging": {
+			Default:     "",
+			Description: "disableLogging is for internal use only",
+			Type:        sdk.ParameterTypeBool,
+			Validations: []sdk.Validation{},
+		},
 		"enableTransaction": {
 			Default:     "",
 			Description: "enableTransaction determines if the client should support transactions.",
@@ -54,6 +60,36 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 			Validations: []sdk.Validation{
 				sdk.ValidationInclusion{List: []string{"exclusive", "shared", "failover", "key_shared"}},
 			},
+		},
+		"tlsAllowInsecureConnection": {
+			Default:     "",
+			Description: "tlsAllowInsecureConnection configures whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)",
+			Type:        sdk.ParameterTypeBool,
+			Validations: []sdk.Validation{},
+		},
+		"tlsCertificateFile": {
+			Default:     "",
+			Description: "tlsCertificateFile sets the path to the TLS certificate file",
+			Type:        sdk.ParameterTypeString,
+			Validations: []sdk.Validation{},
+		},
+		"tlsKeyFilePath": {
+			Default:     "",
+			Description: "tlsKeyFilePath sets the path to the TLS key file",
+			Type:        sdk.ParameterTypeString,
+			Validations: []sdk.Validation{},
+		},
+		"tlsTrustCertsFilePath": {
+			Default:     "",
+			Description: "tlsTrustCertsFilePath sets the path to the trusted TLS certificate file",
+			Type:        sdk.ParameterTypeString,
+			Validations: []sdk.Validation{},
+		},
+		"tlsValidateHostname": {
+			Default:     "",
+			Description: "tlsValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)",
+			Type:        sdk.ParameterTypeBool,
+			Validations: []sdk.Validation{},
 		},
 		"topic": {
 			Default:     "",

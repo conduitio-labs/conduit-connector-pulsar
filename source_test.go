@@ -17,9 +17,9 @@ package pulsar
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"testing"
 
+	"github.com/alarbada/conduit-connector-apache-pulsar/test"
 	"github.com/apache/pulsar-client-go/pulsar"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/matryer/is"
@@ -36,12 +36,13 @@ func TestSource_Integration_RestartFull(t *testing.T) {
 	t.Parallel()
 	is := is.New(t)
 
-	topic := setupTopicName(t, is)
+	topic := test.SetupTopicName(t, is)
 
 	cfgMap := map[string]string{
-		"url":              "pulsar://localhost:6650",
+		"url":              test.PulsarURL,
 		"topic":            topic,
 		"subscriptionName": topic + "-subscription",
+		"disableLogging":   "true",
 	}
 
 	recs1 := generatePulsarMsgs(1, 3)
@@ -57,12 +58,13 @@ func TestSource_Integration_RestartPartial(t *testing.T) {
 	t.Parallel()
 	is := is.New(t)
 
-	topic := setupTopicName(t, is)
+	topic := test.SetupTopicName(t, is)
 
 	cfgMap := map[string]string{
-		"url":              "pulsar://localhost:6650",
+		"url":              test.PulsarURL,
 		"topic":            topic,
 		"subscriptionName": topic + "-subscription",
+		"disableLogging":   "true",
 	}
 
 	recs1 := generatePulsarMsgs(1, 3)
@@ -78,6 +80,7 @@ func TestSource_Integration_RestartPartial(t *testing.T) {
 	var wantRecs []*pulsar.ProducerMessage
 	wantRecs = append(wantRecs, recs1[1:]...)
 	wantRecs = append(wantRecs, recs2...)
+
 	testSourceIntegrationRead(is, cfgMap, lastPosition, wantRecs, false)
 }
 
@@ -96,7 +99,7 @@ func generatePulsarMsgs(from, to int) []*pulsar.ProducerMessage {
 
 func producePulsarMsgs(is *is.I, topic string, msgs []*pulsar.ProducerMessage) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: "pulsar://localhost:6650",
+		URL: test.PulsarURL,
 	})
 	is.NoErr(err)
 	defer client.Close()
@@ -109,6 +112,8 @@ func producePulsarMsgs(is *is.I, topic string, msgs []*pulsar.ProducerMessage) {
 
 	for _, msg := range msgs {
 		_, err = producer.Send(context.Background(), msg)
+		fmt.Println("sent message key", msg.Key)
+
 		is.NoErr(err)
 	}
 }
@@ -140,7 +145,11 @@ func testSourceIntegrationRead(
 	for _, wantRecord := range wantRecords {
 		rec, err := underTest.Read(ctx)
 		is.NoErr(err)
-		is.Equal(wantRecord.Key, string(rec.Key.Bytes()))
+
+		recKey := string(rec.Key.Bytes())
+		fmt.Println("read message key", recKey)
+
+		is.Equal(wantRecord.Key, recKey)
 
 		positions = append(positions, rec.Position)
 	}
@@ -154,33 +163,4 @@ func testSourceIntegrationRead(
 	}
 
 	return positions[len(positions)-1]
-}
-
-// setupTopicName creates a new topic name for the test and deletes it if it
-// exists, so that the test can start from a clean slate.
-func setupTopicName(t *testing.T, is *is.I) string {
-	topic := "pulsar.topic." + t.Name()
-	deletePulsarTopic(is, topic)
-
-	return topic
-}
-
-func deletePulsarTopic(is *is.I, topic string) {
-	url := fmt.Sprintf(
-		"http://localhost:8080/admin/v2/persistent/public/default/%s?force=true",
-		topic)
-
-	req, err := http.NewRequest("DELETE", url, nil)
-	is.NoErr(err)
-
-	res, err := http.DefaultClient.Do(req)
-	is.NoErr(err)
-	defer res.Body.Close()
-
-	// topic not found, nothing to delete
-	if res.StatusCode == http.StatusNotFound {
-		return
-	}
-
-	is.Equal(res.StatusCode, http.StatusNoContent)
 }

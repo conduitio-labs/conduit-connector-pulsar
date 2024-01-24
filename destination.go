@@ -49,7 +49,7 @@ func (d *Destination) Configure(ctx context.Context, cfg map[string]string) erro
 }
 
 func (d *Destination) Open(_ context.Context) error {
-	var logger log.Logger = nil
+	var logger log.Logger
 	if d.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}

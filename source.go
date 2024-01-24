@@ -58,8 +58,8 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
-	var logger log.Logger = nil
+func (s *Source) Open(_ context.Context, _ sdk.Position) error {
+	var logger log.Logger
 	if s.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}
@@ -95,30 +95,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
 
-	if pos != nil {
-		messageID, err := pulsar.DeserializeMessageID(pos)
-		if err != nil {
-			return fmt.Errorf(
-				"failed to deserialize message ID while trying to seek the given position %s: %w",
-				string(pos), err,
-			)
-		}
-		if err := s.consumer.Seek(messageID); err != nil {
-			return fmt.Errorf(
-				"failed to seek to the given position %s: %w",
-				string(pos), err,
-			)
-		}
-
-		// advance one message, as seek is inclusive
-		_, err = s.consumer.Receive(ctx)
-		if err != nil {
-			return fmt.Errorf(
-				"failed to receive message after seeking to the given position %s: %w",
-				string(pos), err,
-			)
-		}
-	}
+	// TODO: handle position
 
 	return nil
 }
