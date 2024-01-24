@@ -6,7 +6,8 @@ build:
 	go build -ldflags "-X 'github.com/alarbada/conduit-connector-apache-pulsar.version=${VERSION}'" -o pulsar cmd/connector/main.go
 
 test:
-	rm -f test/*.pem
+	trap 'rm -f test/*.pem' EXIT
+	rm -rf test/*.pem
 	cd test && ./setup-tls.sh
 	# run required docker containers, execute integration tests, stop containers after tests
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
