@@ -6,14 +6,14 @@ build:
 	go build -ldflags "-X 'github.com/alarbada/conduit-connector-apache-pulsar.version=${VERSION}'" -o pulsar cmd/connector/main.go
 
 test:
-	go test $(GOTEST_FLAGS) -race ./...
-
-test-integration:
+	rm -f test/*.pem
+	cd test && ./setup-tls.sh
 	# run required docker containers, execute integration tests, stop containers after tests
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
-	go test $(GOTEST_FLAGS) -race .; ret=$$?; \
+	go test $(GOTEST_FLAGS) -v -count=1 -race .; ret=$$?; \
 		docker compose -f test/docker-compose.yml down; \
 		exit $$ret
+	rm -f test/*.pem
 
 generate:
 	go generate ./...
@@ -23,3 +23,4 @@ install-paramgen:
 
 lint:
 	golangci-lint run
+
