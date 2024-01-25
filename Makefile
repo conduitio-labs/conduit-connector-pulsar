@@ -9,10 +9,10 @@ test:
 	rm -rf test/*.pem
 	cd test && ./setup-tls.sh
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
-	go test $(GOTEST_FLAGS) -race .; ret=$$?
-	rm -f test/*.pem
-	docker compose -f test/docker-compose.yml down
-	exit $$ret
+	go test $(GOTEST_FLAGS) -race .; ret=$$?; \
+		rm -f test/*.pem && \
+		docker compose -f test/docker-compose.yml down && \
+		exit $$ret
 
 test-debug:
 	make test GOTEST_FLAGS="-v -count=1"
