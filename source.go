@@ -129,11 +129,17 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 		return sdk.Record{}, fmt.Errorf("failed to receive message: %w", err)
 	}
 
+	msgID := msg.ID()
+	msgIDStr := msgID.String()
+
 	s.mx.Lock()
-	s.received[msg.ID().String()] = msg
+	s.received[msgIDStr] = msg
 	s.mx.Unlock()
 
-	position := Position{s.config.SubscriptionName}
+	position := Position{
+		MessageID:        msgID.Serialize(),
+		SubscriptionName: s.config.SubscriptionName,
+	}
 	sdkPos := position.ToSDKPosition()
 
 	metadata := sdk.Metadata{MetadataPulsarTopic: msg.Topic()}
@@ -150,7 +156,12 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Attempting to ack message")
 
-	msgID, err := pulsar.DeserializeMessageID(position)
+	parsed, err := parsePosition(position)
+	if err != nil {
+		return err
+	}
+
+	msgID, err := pulsar.DeserializeMessageID(parsed.MessageID)
 	if err != nil {
 		return fmt.Errorf("failed to deserialize message ID: %w", err)
 	}
@@ -174,6 +185,7 @@ func (s *Source) Teardown(_ context.Context) error {
 }
 
 type Position struct {
+	MessageID        []byte `json:"messageID"`
 	SubscriptionName string `json:"subscriptionName"`
 }
 
