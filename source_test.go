@@ -112,8 +112,6 @@ func producePulsarMsgs(is *is.I, topic string, msgs []*pulsar.ProducerMessage) {
 
 	for _, msg := range msgs {
 		_, err = producer.Send(context.Background(), msg)
-		fmt.Println("sent message key", msg.Key)
-
 		is.NoErr(err)
 	}
 }
@@ -147,8 +145,6 @@ func testSourceIntegrationRead(
 		is.NoErr(err)
 
 		recKey := string(rec.Key.Bytes())
-		fmt.Println("read message key", recKey)
-
 		is.Equal(wantRecord.Key, recKey)
 
 		positions = append(positions, rec.Position)
