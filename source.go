@@ -18,12 +18,14 @@ package pulsar
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
 	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/google/uuid"
 )
 
 type Source struct {
@@ -58,7 +60,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(_ context.Context, _ sdk.Position) error {
+func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	var logger log.Logger
 	if s.config.DisableLogging {
 		logger = log.DefaultNopLogger()
@@ -93,10 +95,24 @@ func (s *Source) Open(_ context.Context, _ sdk.Position) error {
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
 
-	// TODO: handle position.
-	// Right now, the user must specify the subscription name. We might want to
-	// relieve him in the future of that implementation detail, and manually create it
-	// ourselves using something like the google uuid package to enforce uniqueness.
+	if pos != nil {
+		p, err := parsePosition(pos)
+		if err != nil {
+			return err
+		}
+
+		if s.config.SubscriptionName != "" && s.config.SubscriptionName != p.SubscriptionName {
+			return fmt.Errorf("the old position contains a different subscription name than the connector configuration (%q vs %q), please check if the configured subscription name changed since the last run", p.SubscriptionName, s.config.SubscriptionName)
+		}
+
+		s.config.SubscriptionName = p.SubscriptionName
+	}
+
+	if s.config.SubscriptionName == "" {
+		// this must be the first run of the connector, create a new group ID
+		s.config.SubscriptionName = uuid.NewString()
+		sdk.Logger(ctx).Info().Str("subscriptionName", s.config.SubscriptionName).Msg("assigning source to new subscription")
+	}
 
 	return nil
 }
@@ -117,9 +133,8 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	s.received[msg.ID().String()] = msg
 	s.mx.Unlock()
 
-	position := sdk.Position(msg.ID().Serialize())
-
-	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Setting position for message")
+	position := Position{s.config.SubscriptionName}
+	sdkPos := position.ToSDKPosition()
 
 	metadata := sdk.Metadata{MetadataPulsarTopic: msg.Topic()}
 	metadata.SetCreatedAt(msg.EventTime())
@@ -127,12 +142,9 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	key := sdk.RawData(msg.Key())
 	payload := sdk.RawData(msg.Payload())
 
-	return sdk.Util.Source.NewRecordCreate(
-		position,
-		metadata,
-		key,
-		payload,
-	), nil
+	newRecord := sdk.Util.Source.NewRecordCreate(sdkPos, metadata, key, payload)
+
+	return newRecord, nil
 }
 
 func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
@@ -159,4 +171,25 @@ func (s *Source) Teardown(_ context.Context) error {
 		s.consumer.Close()
 	}
 	return nil
+}
+
+type Position struct {
+	SubscriptionName string `json:"subscriptionName"`
+}
+
+func parsePosition(pos sdk.Position) (Position, error) {
+	var p Position
+	err := json.Unmarshal(pos, &p)
+
+	return p, err
+}
+
+func (p Position) ToSDKPosition() sdk.Position {
+	bs, err := json.Marshal(p)
+	if err != nil {
+		// this error should not be possible
+		panic(fmt.Errorf("error marshaling position to JSON: %w", err))
+	}
+
+	return sdk.Position(bs)
 }
