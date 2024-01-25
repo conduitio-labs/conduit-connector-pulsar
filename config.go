@@ -16,8 +16,6 @@ package pulsar
 
 import (
 	"time"
-
-	"github.com/apache/pulsar-client-go/pulsar"
 )
 
 //go:generate paramgen -output=paramgen_src.go SourceConfig
@@ -73,22 +71,6 @@ type SourceConfig struct {
 	// SubscriptionName is the name of the subscription to be used for
 	// consuming messages.
 	SubscriptionName string `json:"subscriptionName" validate:"required"`
-}
-
-var subscriptionTypes = map[string]pulsar.SubscriptionType{
-	"exclusive":  pulsar.Exclusive,
-	"shared":     pulsar.Shared,
-	"failover":   pulsar.Failover,
-	"key_shared": pulsar.KeyShared,
-}
-
-func parseSubscriptionType(s string) pulsar.SubscriptionType {
-	subscriptionType, ok := subscriptionTypes[s]
-	if !ok {
-		return pulsar.Exclusive
-	}
-
-	return subscriptionType
 }
 
 type DestinationConfig struct {

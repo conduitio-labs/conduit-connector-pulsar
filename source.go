@@ -86,14 +86,17 @@ func (s *Source) Open(_ context.Context, _ sdk.Position) error {
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
 		SubscriptionName: s.config.SubscriptionName,
-		Type:             pulsar.Shared,
+		Type:             pulsar.Exclusive,
 	})
 	if err != nil {
 		client.Close()
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
 
-	// TODO: handle position
+	// TODO: handle position.
+	// Right now, the user must specify the subscription name. We might want to
+	// relieve him in the future of that implementation detail, and manually create it
+	// ourselves using something like the google uuid package to enforce uniqueness.
 
 	return nil
 }
