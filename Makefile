@@ -25,9 +25,13 @@ install-paramgen:
 lint:
 	golangci-lint run
 
+clean:
+	rm -rf test/*.pem
 
 up:
+	cd test && ./setup-tls.sh
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
 
 down:
 	docker compose -f test/docker-compose.yml down
+	rm -rf test/*.pem
