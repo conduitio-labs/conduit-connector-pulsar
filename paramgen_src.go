@@ -49,9 +49,7 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 			Default:     "",
 			Description: "subscriptionName is the name of the subscription to be used for consuming messages.",
 			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{
-				sdk.ValidationRequired{},
-			},
+			Validations: []sdk.Validation{},
 		},
 		"tlsAllowInsecureConnection": {
 			Default:     "",

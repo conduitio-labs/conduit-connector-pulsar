@@ -70,7 +70,7 @@ type SourceConfig struct {
 
 	// SubscriptionName is the name of the subscription to be used for
 	// consuming messages.
-	SubscriptionName string `json:"subscriptionName" validate:"required"`
+	SubscriptionName string `json:"subscriptionName"`
 }
 
 type DestinationConfig struct {
