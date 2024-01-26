@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
@@ -32,16 +31,11 @@ type Source struct {
 	sdk.UnimplementedSource
 
 	consumer pulsar.Consumer
-	received map[string]pulsar.Message
-	mx       *sync.Mutex
 	config   SourceConfig
 }
 
 func NewSource() sdk.Source {
-	source := &Source{
-		mx:       &sync.Mutex{},
-		received: make(map[string]pulsar.Message),
-	}
+	source := &Source{}
 
 	return sdk.SourceWithMiddleware(source, sdk.DefaultSourceMiddleware()...)
 }
@@ -130,11 +124,6 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	}
 
 	msgID := msg.ID()
-	msgIDStr := msgID.String()
-
-	s.mx.Lock()
-	s.received[msgIDStr] = msg
-	s.mx.Unlock()
 
 	position := Position{
 		MessageID:        msgID.Serialize(),
@@ -166,15 +155,7 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 		return fmt.Errorf("failed to deserialize message ID: %w", err)
 	}
 
-	s.mx.Lock()
-	defer s.mx.Unlock()
-	msg, ok := s.received[msgID.String()]
-	if ok {
-		delete(s.received, msgID.String())
-		return s.consumer.Ack(msg)
-	}
-
-	return fmt.Errorf("message not found for position: %s", string(position))
+	return s.consumer.AckID(msgID)
 }
 
 func (s *Source) Teardown(_ context.Context) error {
