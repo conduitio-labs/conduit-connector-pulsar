@@ -6,13 +6,21 @@ build:
 	go build -ldflags "-X 'github.com/alarbada/conduit-connector-apache-pulsar.version=${VERSION}'" -o pulsar cmd/connector/main.go
 
 test:
-	rm -rf test/*.pem
-	cd test && ./setup-tls.sh
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
-	go test $(GOTEST_FLAGS) -race .; ret=$$?; \
-		rm -f test/*.pem && \
+	go test -v -count=1 -race .; ret=$$?; \
 		docker compose -f test/docker-compose.yml down && \
 		exit $$ret
+
+test-tls:
+	rm -rf test/*.pem
+	cd test && ./setup-tls.sh
+	docker compose -f test/docker-compose-tls.yml up --quiet-pull -d --wait 
+	export PULSAR_TLS=true && \
+	go test -v -count=1 -run TLS -race .; ret=$$?; \
+		docker compose -f test/docker-compose-tls.yml down && \
+		rm -rf test/*.pem && \
+		exit $$ret
+
 
 test-debug:
 	make test GOTEST_FLAGS="-v -count=1"

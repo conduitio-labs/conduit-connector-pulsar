@@ -1,12 +1,12 @@
 version: '3'
 
 services:
-  pulsar:
-    container_name: pulsar
+  pulsar-tls:
+    container_name: pulsar_tls
     image: apachepulsar/pulsar:3.1.2
-    command: bin/pulsar standalone
+    command: bin/pulsar standalone --config /pulsar/certs/standalone.conf
     ports:
-      - "6650:6650"
+      - "6651:6651"
       - "8080:8080"
     healthcheck:
       test: >
@@ -16,4 +16,5 @@ services:
       timeout: 20s
       retries: 6
       start_period: 30s
-
+    volumes:
+      - .:/pulsar/certs

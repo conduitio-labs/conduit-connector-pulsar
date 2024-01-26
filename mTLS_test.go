@@ -16,6 +16,7 @@ package pulsar
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/alarbada/conduit-connector-apache-pulsar/test"
@@ -25,6 +26,10 @@ import (
 )
 
 func Test_mTLS_Setup(t *testing.T) {
+	if os.Getenv("PULSAR_TLS") != "true" {
+		t.Skip("Skipping mTLS tests")
+	}
+
 	is := is.New(t)
 
 	topic := test.SetupTopicName(t, is)

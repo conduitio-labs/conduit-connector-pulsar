@@ -41,32 +41,21 @@ func SetupTopicName(t *testing.T, is *is.I) string {
 }
 
 func DeletePulsarTopic(is *is.I, topic string) {
-	serverURLs := []string{
-		"http://127.0.0.1:8080",
-		"http://127.0.0.1:8081",
+	url := fmt.Sprintf(
+		"http://127.0.0.1:8080/admin/v2/persistent/public/default/%s?force=true",
+		topic)
+
+	req, err := http.NewRequestWithContext(context.Background(), "DELETE", url, nil)
+	is.NoErr(err)
+
+	res, err := http.DefaultClient.Do(req)
+	is.NoErr(err)
+	res.Body.Close()
+
+	// topic not found, nothing to delete
+	if res.StatusCode == http.StatusNotFound {
+		return
 	}
 
-	// We delete the given topic on both servers, we assume that the topic
-	// name is unique to the test itself
-
-	for _, serverURL := range serverURLs {
-		url := fmt.Sprintf(
-			"%s/admin/v2/persistent/public/default/%s?force=true",
-			serverURL, topic,
-		)
-
-		req, err := http.NewRequestWithContext(context.Background(), "DELETE", url, nil)
-		is.NoErr(err)
-
-		res, err := http.DefaultClient.Do(req)
-		is.NoErr(err)
-		res.Body.Close()
-
-		// topic not found, nothing to delete
-		if res.StatusCode == http.StatusNotFound {
-			continue
-		}
-
-		is.Equal(res.StatusCode, http.StatusNoContent)
-	}
+	is.Equal(res.StatusCode, http.StatusNoContent)
 }

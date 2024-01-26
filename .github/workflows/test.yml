@@ -16,5 +16,8 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - name: Test with Apache Pulsar
-        run: make test GOTEST_FLAGS="-v -count=1"
+      - name: Integration test with Apache Pulsar
+        run: make test
+
+      - name: mTLS Integration test with Apache Pulsar
+        run: make test-tls
