@@ -32,18 +32,23 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 	is.NoErr(err)
 }
 
+func newSourceCfg(topic string) map[string]string {
+	return map[string]string{
+		"url":               test.PulsarURL,
+		"topic":             topic,
+		"subscriptionName":  topic + "-subscription",
+		"disableLogging":    "true",
+		"connectionTimeout": "10s",
+		"operationTimeout":  "10s",
+	}
+}
+
 func TestSource_Integration_RestartFull(t *testing.T) {
 	t.Parallel()
 	is := is.New(t)
 
 	topic := test.SetupTopicName(t, is)
-
-	cfgMap := map[string]string{
-		"url":              test.PulsarURL,
-		"topic":            topic,
-		"subscriptionName": topic + "-subscription",
-		"disableLogging":   "true",
-	}
+	cfgMap := newSourceCfg(topic)
 
 	recs1 := generatePulsarMsgs(1, 3)
 	go producePulsarMsgs(is, topic, recs1)
@@ -59,13 +64,7 @@ func TestSource_Integration_RestartPartial(t *testing.T) {
 	is := is.New(t)
 
 	topic := test.SetupTopicName(t, is)
-
-	cfgMap := map[string]string{
-		"url":              test.PulsarURL,
-		"topic":            topic,
-		"subscriptionName": topic + "-subscription",
-		"disableLogging":   "true",
-	}
+	cfgMap := newSourceCfg(topic)
 
 	recs1 := generatePulsarMsgs(1, 3)
 	go producePulsarMsgs(is, topic, recs1)

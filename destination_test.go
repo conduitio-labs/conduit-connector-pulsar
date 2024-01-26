@@ -64,11 +64,12 @@ func connectorDestinationWrite(is *is.I, topic string) {
 
 	ctx := context.Background()
 
-	err := con.Configure(ctx, map[string]string{
-		"URL":          test.PulsarURL,
-		"topic":        topic,
-		"subscription": topic,
-	})
+	cfgMap := map[string]string{
+		"url":   test.PulsarURL,
+		"topic": topic,
+	}
+
+	err := con.Configure(ctx, cfgMap)
 	is.NoErr(err)
 
 	err = con.Open(ctx)
