@@ -45,11 +45,11 @@ func (s *Source) Parameters() map[string]sdk.Parameter {
 }
 
 func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
-	sdk.Logger(ctx).Info().Msg("Configuring Source...")
-
 	if err := sdk.Util.ParseConfig(cfg, &s.config); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
+
+	sdk.Logger(ctx).Info().Msg("Configuring Source...")
 
 	return nil
 }
@@ -78,6 +78,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
+	sdk.Logger(ctx).Debug().Msg("Created Pulsar client")
 
 	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
 		Topic:            s.config.Topic,
@@ -88,6 +89,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		client.Close()
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
+	sdk.Logger(ctx).Debug().Msg("created pulsar consumer")
 
 	if pos != nil {
 		p, err := parsePosition(pos)
@@ -100,6 +102,8 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 		}
 
 		s.config.SubscriptionName = p.SubscriptionName
+
+		sdk.Logger(ctx).Info().Str("subscriptionName", s.config.SubscriptionName).Msg("resuming from position")
 	}
 
 	if s.config.SubscriptionName == "" {
@@ -111,13 +115,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	return nil
 }
 
-const (
-	// MetadataPulsarTopic is the metadata key for storing the pulsar topic
-	MetadataPulsarTopic = "pulsar.topic"
-)
-
 func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
-	sdk.Logger(ctx).Debug().Msg("reading message")
 	msg, err := s.consumer.Receive(ctx)
 	if err != nil {
 		return sdk.Record{}, fmt.Errorf("failed to receive message: %w", err)
@@ -131,7 +129,7 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	}
 	sdkPos := position.ToSDKPosition()
 
-	metadata := sdk.Metadata{MetadataPulsarTopic: msg.Topic()}
+	metadata := sdk.Metadata{"pulsar.topic": msg.Topic()}
 	metadata.SetCreatedAt(msg.EventTime())
 
 	key := sdk.RawData(msg.Key())
@@ -139,12 +137,12 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 
 	newRecord := sdk.Util.Source.NewRecordCreate(sdkPos, metadata, key, payload)
 
+	sdk.Logger(ctx).Debug().Msg("received message")
+
 	return newRecord, nil
 }
 
 func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
-	sdk.Logger(ctx).Debug().Str("MessageID", string(position)).Msg("Attempting to ack message")
-
 	parsed, err := parsePosition(position)
 	if err != nil {
 		return err
@@ -155,13 +153,18 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 		return fmt.Errorf("failed to deserialize message ID: %w", err)
 	}
 
+	sdk.Logger(ctx).Debug().Str("MessageID", msgID.String()).Msg("acked message")
+
 	return s.consumer.AckID(msgID)
 }
 
-func (s *Source) Teardown(_ context.Context) error {
+func (s *Source) Teardown(ctx context.Context) error {
 	if s.consumer != nil {
 		s.consumer.Close()
 	}
+
+	sdk.Logger(ctx).Debug().Msg("source teardown complete")
+
 	return nil
 }
 

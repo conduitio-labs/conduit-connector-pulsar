@@ -59,6 +59,15 @@ func TestDestination_Integration(t *testing.T) {
 
 var exampleMessage = "example message"
 
+func newDestinationCfg(topic string) map[string]string {
+	cfgMap := map[string]string{
+		"url":   test.PulsarURL,
+		"topic": topic,
+	}
+
+	return cfgMap
+}
+
 func connectorDestinationWrite(is *is.I, topic string) {
 	con := NewDestination()
 

@@ -2,6 +2,7 @@ version: '3'
 
 services:
   pulsar:
+    stop_grace_period: 100ms
     container_name: pulsar
     image: apachepulsar/pulsar:3.1.2
     command: bin/pulsar standalone
@@ -12,8 +13,8 @@ services:
       test: >
         sh -c "/pulsar/bin/pulsar-admin brokers healthcheck &&
                /pulsar/bin/pulsar-admin topics list public/default"
-      interval: 5s
+      interval: 2s
       timeout: 20s
-      retries: 6
-      start_period: 30s
+      retries: 100
+      start_period: 100ms
 

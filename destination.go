@@ -39,8 +39,6 @@ func (d *Destination) Parameters() map[string]sdk.Parameter {
 }
 
 func (d *Destination) Configure(ctx context.Context, cfg map[string]string) error {
-	sdk.Logger(ctx).Info().Msg("Configuring Destination...")
-
 	if err := sdk.Util.ParseConfig(cfg, &d.config); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
@@ -48,7 +46,7 @@ func (d *Destination) Configure(ctx context.Context, cfg map[string]string) erro
 	return nil
 }
 
-func (d *Destination) Open(_ context.Context) error {
+func (d *Destination) Open(ctx context.Context) error {
 	var logger log.Logger
 	if d.config.DisableLogging {
 		logger = log.DefaultNopLogger()
@@ -72,6 +70,7 @@ func (d *Destination) Open(_ context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
+	sdk.Logger(ctx).Info().Msg("created destination client")
 
 	d.producer, err = client.CreateProducer(pulsar.ProducerOptions{
 		Topic: d.config.Topic,
@@ -79,6 +78,7 @@ func (d *Destination) Open(_ context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to create producer: %w", err)
 	}
+	sdk.Logger(ctx).Info().Msg("created destination producer")
 
 	return nil
 }
@@ -86,9 +86,7 @@ func (d *Destination) Open(_ context.Context) error {
 func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, error) {
 	var written int
 	for _, record := range records {
-		sdk.Logger(ctx).Debug().Msgf("Writing record")
 		key := string(record.Key.Bytes())
-
 		_, err := d.producer.Send(ctx, &pulsar.ProducerMessage{
 			Payload: record.Bytes(),
 			Key:     key,
@@ -97,17 +95,19 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 			return written, fmt.Errorf("failed to send message: %w", err)
 		}
 
-		sdk.Logger(ctx).Debug().Msgf("Successfully wrote record")
+		sdk.Logger(ctx).Debug().Str("key", key).Msg("sent message")
 		written++
 	}
 
 	return written, nil
 }
 
-func (d *Destination) Teardown(_ context.Context) error {
+func (d *Destination) Teardown(ctx context.Context) error {
 	if d.producer != nil {
 		d.producer.Close()
 	}
+
+	sdk.Logger(ctx).Info().Msg("teardown complete")
 
 	return nil
 }
