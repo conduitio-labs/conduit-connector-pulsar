@@ -7,7 +7,6 @@ require (
 	github.com/conduitio/conduit-connector-sdk v0.8.0
 	github.com/google/uuid v1.6.0
 	github.com/matryer/is v1.4.1
-	github.com/rs/zerolog v1.31.0
 )
 
 require (
@@ -63,6 +62,7 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.46.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
+	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
