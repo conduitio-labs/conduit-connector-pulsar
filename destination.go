@@ -39,7 +39,7 @@ func (d *Destination) Parameters() map[string]sdk.Parameter {
 	return d.config.Parameters()
 }
 
-func (d *Destination) Configure(ctx context.Context, cfg map[string]string) error {
+func (d *Destination) Configure(_ context.Context, cfg map[string]string) error {
 	if err := sdk.Util.ParseConfig(cfg, &d.config); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
@@ -103,7 +103,7 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 
 		sdk.Logger(ctx).Debug().
 			Str("topic", d.config.Topic).
-			Str("key", sliceFirstX(key, 20)).Msg("sent message")
+			Str("key", key).Msg("sent message")
 		written++
 	}
 
