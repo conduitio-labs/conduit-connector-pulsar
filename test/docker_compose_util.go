@@ -17,8 +17,11 @@ package test
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/matryer/is"
 )
@@ -35,22 +38,30 @@ const (
 // exists, so that the test can start from a clean slate.
 func SetupTopicName(t *testing.T, is *is.I) string {
 	topic := "pulsar.topic." + t.Name()
+	topic = strings.ReplaceAll(topic, "/", "_")
 	DeletePulsarTopic(is, topic)
 
 	return topic
 }
 
 func DeletePulsarTopic(is *is.I, topic string) {
+	// Use a context with timeout to avoid hanging requests.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel() // Ensure resources are freed even in case of early return.
 	url := fmt.Sprintf(
 		"http://127.0.0.1:8080/admin/v2/persistent/public/default/%s?force=true",
 		topic)
 
-	req, err := http.NewRequestWithContext(context.Background(), "DELETE", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "DELETE", url, nil)
 	is.NoErr(err)
 
 	res, err := http.DefaultClient.Do(req)
 	is.NoErr(err)
-	res.Body.Close()
+	defer res.Body.Close()
+
+	// Read and discard the response body to ensure the connection can be reused.
+	_, err = io.Copy(io.Discard, res.Body)
+	is.NoErr(err)
 
 	// topic not found, nothing to delete
 	if res.StatusCode == http.StatusNotFound {

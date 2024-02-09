@@ -26,6 +26,7 @@ import (
 type Destination struct {
 	sdk.UnimplementedDestination
 
+	client   pulsar.Client
 	producer pulsar.Producer
 	config   DestinationConfig
 }
@@ -46,13 +47,13 @@ func (d *Destination) Configure(ctx context.Context, cfg map[string]string) erro
 	return nil
 }
 
-func (d *Destination) Open(ctx context.Context) error {
+func (d *Destination) Open(ctx context.Context) (err error) {
 	var logger log.Logger
 	if d.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}
 
-	client, err := pulsar.NewClient(pulsar.ClientOptions{
+	d.client, err = pulsar.NewClient(pulsar.ClientOptions{
 		URL:                        d.config.URL,
 		ConnectionTimeout:          d.config.ConnectionTimeout,
 		OperationTimeout:           d.config.OperationTimeout,
@@ -72,8 +73,13 @@ func (d *Destination) Open(ctx context.Context) error {
 	}
 	sdk.Logger(ctx).Info().Msg("created destination client")
 
-	d.producer, err = client.CreateProducer(pulsar.ProducerOptions{
+	d.producer, err = d.client.CreateProducer(pulsar.ProducerOptions{
 		Topic: d.config.Topic,
+
+		// SendTimeout set to -1 disables the timeout to prevent acceptance
+		// tests to detect leaking goroutines.
+		// TODO: it might be better for this to be configurable (issue #9)
+		SendTimeout: -1,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create producer: %w", err)
@@ -95,10 +101,13 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 			return written, fmt.Errorf("failed to send message: %w", err)
 		}
 
-		sdk.Logger(ctx).Debug().Str("key", key).Msg("sent message")
+		sdk.Logger(ctx).Debug().
+			Str("topic", d.config.Topic).
+			Str("key", sliceFirstX(key, 20)).Msg("sent message")
 		written++
 	}
 
+	sdk.Logger(ctx).Info().Int("total", written).Msg("wrote messages to destination")
 	return written, nil
 }
 
@@ -107,7 +116,11 @@ func (d *Destination) Teardown(ctx context.Context) error {
 		d.producer.Close()
 	}
 
-	sdk.Logger(ctx).Info().Msg("teardown complete")
+	if d.client != nil {
+		d.client.Close()
+	}
+
+	sdk.Logger(ctx).Debug().Msg("destination teardown complete")
 
 	return nil
 }

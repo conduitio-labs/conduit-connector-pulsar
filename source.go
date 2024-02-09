@@ -30,6 +30,7 @@ import (
 type Source struct {
 	sdk.UnimplementedSource
 
+	client   pulsar.Client
 	consumer pulsar.Consumer
 	config   SourceConfig
 }
@@ -49,18 +50,18 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	sdk.Logger(ctx).Info().Msg("Configuring Source...")
+	sdk.Logger(ctx).Info().Str("topic", s.config.Topic).Msg("configured source")
 
 	return nil
 }
 
-func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
+func (s *Source) Open(ctx context.Context, pos sdk.Position) (err error) {
 	var logger log.Logger
 	if s.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}
 
-	client, err := pulsar.NewClient(pulsar.ClientOptions{
+	s.client, err = pulsar.NewClient(pulsar.ClientOptions{
 		URL:                        s.config.URL,
 		ConnectionTimeout:          s.config.ConnectionTimeout,
 		OperationTimeout:           s.config.OperationTimeout,
@@ -80,13 +81,14 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	}
 	sdk.Logger(ctx).Debug().Msg("Created Pulsar client")
 
-	s.consumer, err = client.Subscribe(pulsar.ConsumerOptions{
-		Topic:            s.config.Topic,
-		SubscriptionName: s.config.SubscriptionName,
-		Type:             pulsar.Exclusive,
+	s.consumer, err = s.client.Subscribe(pulsar.ConsumerOptions{
+		Topic:                       s.config.Topic,
+		SubscriptionName:            s.config.SubscriptionName,
+		Type:                        pulsar.Exclusive,
+		SubscriptionInitialPosition: pulsar.SubscriptionPositionEarliest,
 	})
 	if err != nil {
-		client.Close()
+		s.client.Close()
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
 	sdk.Logger(ctx).Debug().Msg("created pulsar consumer")
@@ -161,6 +163,10 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 func (s *Source) Teardown(ctx context.Context) error {
 	if s.consumer != nil {
 		s.consumer.Close()
+	}
+
+	if s.client != nil {
+		s.client.Close()
 	}
 
 	sdk.Logger(ctx).Debug().Msg("source teardown complete")

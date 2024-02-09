@@ -7,6 +7,7 @@ require (
 	github.com/conduitio/conduit-connector-sdk v0.8.0
 	github.com/google/uuid v1.6.0
 	github.com/matryer/is v1.4.1
+	go.uber.org/goleak v1.3.0
 )
 
 require (
@@ -68,7 +69,6 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect

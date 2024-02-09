@@ -25,6 +25,9 @@ test-tls:
 test-debug:
 	make test GOTEST_FLAGS="-v -count=1"
 
+acceptance:
+	go test -run Acceptance -v -count=1 .
+
 generate:
 	go generate ./...
 
@@ -38,9 +41,7 @@ clean:
 	rm -rf test/*.pem
 
 up:
-	cd test && ./setup-tls.sh
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
 
 down:
 	docker compose -f test/docker-compose.yml down
-	rm -rf test/*.pem
