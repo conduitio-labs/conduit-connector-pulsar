@@ -36,9 +36,7 @@ type Source struct {
 }
 
 func NewSource() sdk.Source {
-	source := &Source{}
-
-	return sdk.SourceWithMiddleware(source, sdk.DefaultSourceMiddleware()...)
+	return sdk.SourceWithMiddleware(&Source{}, sdk.DefaultSourceMiddleware()...)
 }
 
 func (s *Source) Parameters() map[string]sdk.Parameter {
