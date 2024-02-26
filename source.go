@@ -121,10 +121,8 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 		return sdk.Record{}, fmt.Errorf("failed to receive message: %w", err)
 	}
 
-	msgID := msg.ID()
-
 	position := Position{
-		MessageID:        msgID.Serialize(),
+		MessageID:        msg.ID().Serialize(),
 		SubscriptionName: s.config.SubscriptionName,
 	}
 	sdkPos := position.ToSDKPosition()
