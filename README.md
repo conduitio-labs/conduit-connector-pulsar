@@ -1,6 +1,6 @@
 # Conduit Connector Apache Pulsar
 
-The Apache Pulsar connector provides both a source and a destination connector for [Apache Pulsar](https://pulsar.apache.org/).
+The Apache Pulsar connector is one of [Conduit](https://conduit.io) plugins. The connector provides both a source and a destination connector for [Apache Pulsar](https://pulsar.apache.org/).
 
 ## How to build?
 Run `make build` to build the connector.
