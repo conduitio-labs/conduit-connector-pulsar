@@ -15,12 +15,6 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 			Type:        sdk.ParameterTypeDuration,
 			Validations: []sdk.Validation{},
 		},
-		"disableLogging": {
-			Default:     "",
-			Description: "disableLogging is for internal use only",
-			Type:        sdk.ParameterTypeBool,
-			Validations: []sdk.Validation{},
-		},
 		"enableTransaction": {
 			Default:     "",
 			Description: "enableTransaction determines if the client should support transactions.",
