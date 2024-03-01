@@ -59,7 +59,7 @@ type Config struct {
 	TLSValidateHostname bool `json:"tlsValidateHostname"`
 
 	// disableLogging is for internal use only
-	DisableLogging bool `json:"disableLogging"`
+	disableLogging bool
 }
 
 type SourceConfig struct {

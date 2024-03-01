@@ -55,7 +55,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 
 func (s *Source) Open(ctx context.Context, pos sdk.Position) (err error) {
 	var logger log.Logger
-	if s.config.DisableLogging {
+	if s.config.disableLogging {
 		logger = log.DefaultNopLogger()
 	}
 
