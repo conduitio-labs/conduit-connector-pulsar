@@ -42,9 +42,9 @@ func Test_mTLS_Setup(t *testing.T) {
 		"subscriptionName":           topic + "-subscription",
 		"tlsAllowInsecureConnection": "false",
 		"tlsValidateHostname":        "true",
-		"tlsCertificateFile":         "./test/client.cert.pem",
-		"tlsKeyFilePath":             "./test/client.key-pk8.pem",
-		"tlsTrustCertsFilePath":      "./test/ca.cert.pem",
+		"tlsCertificateFile":         "./test/certs/client.cert.pem",
+		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
+		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
 	})
 	is.NoErr(err)
 
@@ -62,9 +62,9 @@ func Test_mTLS_Setup(t *testing.T) {
 		"topic":                      topic,
 		"tlsAllowInsecureConnection": "false",
 		"tlsValidateHostname":        "true",
-		"tlsCertificateFile":         "./test/client.cert.pem",
-		"tlsKeyFilePath":             "./test/client.key-pk8.pem",
-		"tlsTrustCertsFilePath":      "./test/ca.cert.pem",
+		"tlsCertificateFile":         "./test/certs/client.cert.pem",
+		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
+		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
 	})
 	is.NoErr(err)
 

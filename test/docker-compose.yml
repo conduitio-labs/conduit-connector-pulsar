@@ -2,7 +2,6 @@ version: '3'
 
 services:
   pulsar:
-    stop_grace_period: 100ms
     container_name: pulsar
     image: apachepulsar/pulsar:3.1.2
     command: bin/pulsar standalone
@@ -18,3 +17,21 @@ services:
       retries: 100
       start_period: 100ms
 
+  pulsar-tls:
+    container_name: pulsar_tls
+    image: apachepulsar/pulsar:3.1.2
+    command: bin/pulsar standalone --config /pulsar/certs/standalone.conf
+    ports:
+      - "6651:6651"
+      - "8080:8080"
+    healthcheck:
+      test: >
+        sh -c "/pulsar/bin/pulsar-admin brokers healthcheck &&
+               /pulsar/bin/pulsar-admin topics list public/default"
+      interval: 5s
+      timeout: 20s
+      retries: 6
+      start_period: 30s
+    volumes:
+      - ./standalone.conf:/pulsar/certs/standalone.conf
+      - ./certs:/pulsar/certs

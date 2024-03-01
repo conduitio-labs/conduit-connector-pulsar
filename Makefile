@@ -6,19 +6,16 @@ build:
 	go build -ldflags "-X 'github.com/alarbada/conduit-connector-apache-pulsar.version=${VERSION}'" -o conduit-connector-pulsar cmd/connector/main.go
 
 test:
-	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
+	docker compose -f test/docker-compose.yml up pulsar --quiet-pull -d --wait 
 	go test -v -count=1 -race .; ret=$$?; \
 		docker compose -f test/docker-compose.yml down && \
 		exit $$ret
 
 test-tls:
-	rm -rf test/*.pem
-	cd test && ./setup-tls.sh
-	docker compose -f test/docker-compose-tls.yml up --quiet-pull -d --wait 
+	docker compose -f test/docker-compose.yml up pulsar-tls --quiet-pull -d --wait 
 	export PULSAR_TLS=true && \
 	go test -v -count=1 -run TLS -race .; ret=$$?; \
-		docker compose -f test/docker-compose-tls.yml down && \
-		rm -rf test/*.pem && \
+		docker compose -f test/docker-compose.yml down && \
 		exit $$ret
 
 
@@ -36,9 +33,6 @@ install-paramgen:
 
 lint:
 	golangci-lint run
-
-clean:
-	rm -rf test/*.pem
 
 up:
 	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 

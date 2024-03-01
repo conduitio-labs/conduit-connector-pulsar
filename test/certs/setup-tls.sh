@@ -11,10 +11,10 @@ openssl genrsa -out broker.key.pem 2048
 openssl pkcs8 -topk8 -inform PEM -outform PEM -in broker.key.pem -out broker.key-pk8.pem -nocrypt
 
 # Generate certificate request for the server:
-openssl req -new -config broker.conf -key broker.key.pem -out broker.csr.pem -sha256
+openssl req -new -config ../broker.conf -key broker.key.pem -out broker.csr.pem -sha256
 
 # Sign server certificate with the CA:
-openssl x509 -req -in broker.csr.pem -CA ca.cert.pem -CAkey ca.key.pem -CAcreateserial -out broker.cert.pem -days 365 -extensions v3_ext -extfile broker.conf -sha256
+openssl x509 -req -in broker.csr.pem -CA ca.cert.pem -CAkey ca.key.pem -CAcreateserial -out broker.cert.pem -days 365 -extensions v3_ext -extfile ../broker.conf -sha256
 
 # Generate the client's private key:
 openssl genrsa -out client.key.pem 2048
