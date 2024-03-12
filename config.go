@@ -25,6 +25,9 @@ type Config struct {
 	// URL of the Pulsar instance to connect to.
 	URL string `json:"url" validate:"required"`
 
+	// Topic specifies the Pulsar topic to which the source / destination will interact with.
+	Topic string `json:"topic" validate:"required"`
+
 	// ConnectionTimeout specifies the duration for which the client will
 	// attempt to establish a connection before timing out.
 	ConnectionTimeout time.Duration `json:"connectionTimeout"`
@@ -75,7 +78,4 @@ type SourceConfig struct {
 
 type DestinationConfig struct {
 	Config
-
-	// Topic specifies the Pulsar topic to which the destination will produce messages.
-	Topic string `json:"topic" validate:"required"`
 }
