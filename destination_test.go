@@ -20,8 +20,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/conduitio-labs/conduit-connector-pulsar/test"
 	"github.com/apache/pulsar-client-go/pulsar"
+	"github.com/conduitio-labs/conduit-connector-pulsar/test"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
