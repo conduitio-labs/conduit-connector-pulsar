@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alarbada/conduit-connector-apache-pulsar/test"
+	"github.com/conduitio-labs/conduit-connector-apache-pulsar/test"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/matryer/is"
 	"go.uber.org/goleak"

@@ -1,4 +1,4 @@
-module github.com/alarbada/conduit-connector-apache-pulsar
+module github.com/conduitio-labs/conduit-connector-apache-pulsar
 
 go 1.21
 
