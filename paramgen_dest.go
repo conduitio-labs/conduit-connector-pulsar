@@ -71,7 +71,7 @@ func (DestinationConfig) Parameters() map[string]sdk.Parameter {
 		},
 		"topic": {
 			Default:     "",
-			Description: "topic specifies the Pulsar topic to which the destination will produce messages.",
+			Description: "topic specifies the Pulsar topic used by the connector.",
 			Type:        sdk.ParameterTypeString,
 			Validations: []sdk.Validation{
 				sdk.ValidationRequired{},

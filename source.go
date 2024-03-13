@@ -14,8 +14,6 @@
 
 package pulsar
 
-//go:generate paramgen -output=paramgen_src.go SourceConfig
-
 import (
 	"context"
 	"encoding/json"
@@ -135,7 +133,7 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 
 	newRecord := sdk.Util.Source.NewRecordCreate(sdkPos, metadata, key, payload)
 
-	sdk.Logger(ctx).Debug().Msg("received message")
+	sdk.Logger(ctx).Trace().Msg("received message")
 
 	return newRecord, nil
 }
@@ -151,9 +149,13 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 		return fmt.Errorf("failed to deserialize message ID: %w", err)
 	}
 
-	sdk.Logger(ctx).Debug().Str("MessageID", msgID.String()).Msg("acked message")
+	sdk.Logger(ctx).Trace().Str("MessageID", msgID.String()).Msg("acked message")
 
-	return s.consumer.AckID(msgID)
+	err = s.consumer.AckID(msgID)
+	if err != nil {
+		return fmt.Errorf("failed to ack message: %w", err)
+	}
+	return nil
 }
 
 func (s *Source) Teardown(ctx context.Context) error {
@@ -178,8 +180,10 @@ type Position struct {
 func parsePosition(pos sdk.Position) (Position, error) {
 	var p Position
 	err := json.Unmarshal(pos, &p)
-
-	return p, err
+	if err != nil {
+		return Position{}, fmt.Errorf("failed to unmarshal position: %w", err)
+	}
+	return p, nil
 }
 
 func (p Position) ToSDKPosition() sdk.Position {
@@ -189,5 +193,5 @@ func (p Position) ToSDKPosition() sdk.Position {
 		panic(fmt.Errorf("error marshaling position to JSON: %w", err))
 	}
 
-	return sdk.Position(bs)
+	return bs
 }

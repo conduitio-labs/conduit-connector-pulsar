@@ -24,14 +24,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-func init() {
-	// Uncomment this up a logger for tests to use. By default sdk.Logger log calls won't
-	// output anything
-	// log := log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	// log = log.Level(zerolog.InfoLevel)
-	// zerolog.DefaultContextLogger = &log
-}
-
 func TestAcceptance(t *testing.T) {
 	is := is.New(t)
 

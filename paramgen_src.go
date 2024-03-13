@@ -77,7 +77,7 @@ func (SourceConfig) Parameters() map[string]sdk.Parameter {
 		},
 		"topic": {
 			Default:     "",
-			Description: "topic specifies the Pulsar topic from which the source will consume messages.",
+			Description: "topic specifies the Pulsar topic used by the connector.",
 			Type:        sdk.ParameterTypeString,
 			Validations: []sdk.Validation{
 				sdk.ValidationRequired{},
