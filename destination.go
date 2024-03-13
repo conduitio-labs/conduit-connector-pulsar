@@ -101,13 +101,13 @@ func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, err
 			return written, fmt.Errorf("failed to send message: %w", err)
 		}
 
-		sdk.Logger(ctx).Debug().
+		sdk.Logger(ctx).Trace().
 			Str("topic", d.config.Topic).
 			Str("key", key).Msg("sent message")
 		written++
 	}
 
-	sdk.Logger(ctx).Info().Int("total", written).Msg("wrote messages to destination")
+	sdk.Logger(ctx).Trace().Int("total", written).Msg("wrote messages to destination")
 	return written, nil
 }
 

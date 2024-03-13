@@ -15,9 +15,8 @@
 package main
 
 import (
-	sdk "github.com/conduitio/conduit-connector-sdk"
-
 	pulsar "github.com/conduitio-labs/conduit-connector-pulsar"
+	sdk "github.com/conduitio/conduit-connector-sdk"
 )
 
 func main() {

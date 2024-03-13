@@ -52,7 +52,7 @@ func DeletePulsarTopic(is *is.I, topic string) {
 		"http://127.0.0.1:8080/admin/v2/persistent/public/default/%s?force=true",
 		topic)
 
-	req, err := http.NewRequestWithContext(ctx, "DELETE", url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	is.NoErr(err)
 
 	res, err := http.DefaultClient.Do(req)
