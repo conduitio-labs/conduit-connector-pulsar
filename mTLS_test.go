@@ -19,7 +19,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/conduitio-labs/conduit-connector-apache-pulsar/test"
+	"github.com/conduitio-labs/conduit-connector-pulsar/test"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
