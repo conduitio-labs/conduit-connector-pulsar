@@ -1,7 +1,6 @@
 module github.com/conduitio-labs/conduit-connector-pulsar
 
-go 1.21
-toolchain go1.22.2
+go 1.22.2
 
 require (
 	github.com/apache/pulsar-client-go v0.12.1
