@@ -3,7 +3,7 @@ module github.com/conduitio-labs/conduit-connector-pulsar
 go 1.22.2
 
 require (
-	github.com/apache/pulsar-client-go v0.12.1
+	github.com/apache/pulsar-client-go v0.13.0
 	github.com/conduitio/conduit-connector-sdk v0.9.1
 	github.com/golangci/golangci-lint v1.59.1
 	github.com/google/uuid v1.6.0
@@ -84,9 +84,8 @@ require (
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
 	github.com/golangci/gofmt v0.0.0-20231018234816-f50ced29576e // indirect
 	github.com/golangci/misspell v0.6.0 // indirect
@@ -103,6 +102,7 @@ require (
 	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
 	github.com/gostaticanalysis/nilerr v0.1.1 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
+	github.com/hamba/avro/v2 v2.22.2-0.20240625062549-66aad10411d9 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -124,7 +124,7 @@ require (
 	github.com/karamaru-alpha/copyloopvar v1.1.0 // indirect
 	github.com/kisielk/errcheck v1.7.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.5 // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/kulti/thelper v0.6.3 // indirect
 	github.com/kunwardeep/paralleltest v1.0.10 // indirect
 	github.com/kyoh86/exportloopref v0.1.11 // indirect
@@ -132,7 +132,6 @@ require (
 	github.com/ldez/gomoddirectives v0.2.4 // indirect
 	github.com/ldez/tagliatelle v0.5.0 // indirect
 	github.com/leonklingele/grouper v1.1.2 // indirect
-	github.com/linkedin/goavro/v2 v2.12.0 // indirect
 	github.com/lufeee/execinquery v1.2.1 // indirect
 	github.com/macabu/inamedparam v0.1.3 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
