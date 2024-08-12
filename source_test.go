@@ -21,7 +21,7 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/conduitio-labs/conduit-connector-pulsar/test"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/matryer/is"
 )
 
@@ -121,10 +121,10 @@ func producePulsarMsgs(is *is.I, topic string, msgs []*pulsar.ProducerMessage) {
 func testSourceIntegrationRead(
 	is *is.I,
 	cfgMap map[string]string,
-	startFrom sdk.Position,
+	startFrom opencdc.Position,
 	wantRecords []*pulsar.ProducerMessage,
 	ackFirstOnly bool,
-) sdk.Position {
+) opencdc.Position {
 	ctx := context.Background()
 
 	underTest := NewSource()
@@ -138,7 +138,7 @@ func testSourceIntegrationRead(
 	err = underTest.Open(ctx, startFrom)
 	is.NoErr(err)
 
-	var positions []sdk.Position
+	var positions []opencdc.Position
 	for _, wantRecord := range wantRecords {
 		rec, err := underTest.Read(ctx)
 		is.NoErr(err)

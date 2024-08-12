@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/conduitio-labs/conduit-connector-pulsar/test"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
@@ -78,12 +79,12 @@ func Test_mTLS_Setup(t *testing.T) {
 
 	rec := sdk.Util.Source.NewRecordCreate(
 		[]byte(uuid.NewString()),
-		sdk.Metadata{"pulsar.topic": topic},
-		sdk.RawData("test-key"),
-		sdk.RawData(exampleMessage),
+		opencdc.Metadata{"pulsar.topic": topic},
+		opencdc.RawData("test-key"),
+		opencdc.RawData(exampleMessage),
 	)
 
-	_, err = destination.Write(ctx, []sdk.Record{rec})
+	_, err = destination.Write(ctx, []opencdc.Record{rec})
 	is.NoErr(err)
 
 	readRec, err := source.Read(ctx)

@@ -47,4 +47,4 @@ up:
 
 .PHONY: down
 down:
-	docker compose -f test/docker-compose.yml down
+	docker compose -f test/docker-compose.yml down --remove-orphans

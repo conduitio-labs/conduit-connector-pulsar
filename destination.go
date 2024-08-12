@@ -20,6 +20,8 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
+	"github.com/conduitio/conduit-commons/config"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 )
 
@@ -35,12 +37,12 @@ func NewDestination() sdk.Destination {
 	return sdk.DestinationWithMiddleware(&Destination{}, sdk.DefaultDestinationMiddleware()...)
 }
 
-func (d *Destination) Parameters() map[string]sdk.Parameter {
+func (d *Destination) Parameters() config.Parameters {
 	return d.config.Parameters()
 }
 
-func (d *Destination) Configure(_ context.Context, cfg map[string]string) error {
-	if err := sdk.Util.ParseConfig(cfg, &d.config); err != nil {
+func (d *Destination) Configure(ctx context.Context, cfg config.Config) error {
+	if err := sdk.Util.ParseConfig(ctx, cfg, &d.config, d.config.Parameters()); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
@@ -89,7 +91,7 @@ func (d *Destination) Open(ctx context.Context) (err error) {
 	return nil
 }
 
-func (d *Destination) Write(ctx context.Context, records []sdk.Record) (int, error) {
+func (d *Destination) Write(ctx context.Context, records []opencdc.Record) (int, error) {
 	var written int
 	for _, record := range records {
 		key := string(record.Key.Bytes())
