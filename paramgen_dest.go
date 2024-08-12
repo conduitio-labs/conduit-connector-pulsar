@@ -9,6 +9,7 @@ import (
 
 const (
 	DestinationConfigConnectionTimeout          = "connectionTimeout"
+	DestinationConfigDisableLogging             = "disableLogging"
 	DestinationConfigEnableTransaction          = "enableTransaction"
 	DestinationConfigMaxConnectionsPerBroker    = "maxConnectionsPerBroker"
 	DestinationConfigMemoryLimitBytes           = "memoryLimitBytes"
@@ -28,6 +29,12 @@ func (DestinationConfig) Parameters() map[string]config.Parameter {
 			Default:     "",
 			Description: "ConnectionTimeout specifies the duration for which the client will\nattempt to establish a connection before timing out.",
 			Type:        config.ParameterTypeDuration,
+			Validations: []config.Validation{},
+		},
+		DestinationConfigDisableLogging: {
+			Default:     "",
+			Description: "DisableLogging disables pulsar client logs",
+			Type:        config.ParameterTypeBool,
 			Validations: []config.Validation{},
 		},
 		DestinationConfigEnableTransaction: {

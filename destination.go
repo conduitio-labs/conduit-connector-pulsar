@@ -51,7 +51,7 @@ func (d *Destination) Configure(ctx context.Context, cfg config.Config) error {
 
 func (d *Destination) Open(ctx context.Context) (err error) {
 	var logger log.Logger
-	if d.config.disableLogging {
+	if d.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}
 

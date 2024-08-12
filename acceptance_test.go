@@ -29,9 +29,9 @@ func TestAcceptance(t *testing.T) {
 
 	topic := test.SetupTopicName(t, is)
 	cfg := map[string]string{
-		"url":              test.PulsarURL,
-		"topic":            topic,
-		"subscriptionName": "test-subscription",
+		SourceConfigUrl:              test.PulsarURL,
+		SourceConfigTopic:            topic,
+		SourceConfigSubscriptionName: "test-subscription",
 	}
 
 	sdk.AcceptanceTest(t, sdk.ConfigurableAcceptanceTestDriver{
@@ -42,7 +42,7 @@ func TestAcceptance(t *testing.T) {
 			DestinationConfig: cfg,
 			BeforeTest: func(t *testing.T) {
 				topic := test.SetupTopicName(t, is)
-				cfg["topic"] = topic
+				cfg[SourceConfigTopic] = topic
 			},
 			Skip: []string{
 				"TestSource_Configure_RequiredParams",

@@ -34,12 +34,12 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 
 func newSourceCfg(topic string) map[string]string {
 	return map[string]string{
-		"url":               test.PulsarURL,
-		"topic":             topic,
-		"subscriptionName":  topic + "-subscription",
-		"disableLogging":    "true",
-		"connectionTimeout": "10s",
-		"operationTimeout":  "10s",
+		SourceConfigUrl:               test.PulsarURL,
+		SourceConfigTopic:             topic,
+		SourceConfigSubscriptionName:  topic + "-subscription",
+		SourceConfigDisableLogging:    "true",
+		SourceConfigConnectionTimeout: "10s",
+		SourceConfigOperationTimeout:  "10s",
 	}
 }
 

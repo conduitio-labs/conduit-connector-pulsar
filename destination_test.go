@@ -66,8 +66,8 @@ func connectorDestinationWrite(is *is.I, topic string) {
 	ctx := context.Background()
 
 	cfgMap := map[string]string{
-		"url":   test.PulsarURL,
-		"topic": topic,
+		DestinationConfigUrl:   test.PulsarURL,
+		DestinationConfigTopic: topic,
 	}
 
 	err := con.Configure(ctx, cfgMap)
