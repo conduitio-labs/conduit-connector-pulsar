@@ -22,6 +22,7 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/conduitio-labs/conduit-connector-pulsar/test"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
@@ -65,8 +66,8 @@ func connectorDestinationWrite(is *is.I, topic string) {
 	ctx := context.Background()
 
 	cfgMap := map[string]string{
-		"url":   test.PulsarURL,
-		"topic": topic,
+		DestinationConfigUrl:   test.PulsarURL,
+		DestinationConfigTopic: topic,
 	}
 
 	err := con.Configure(ctx, cfgMap)
@@ -77,12 +78,12 @@ func connectorDestinationWrite(is *is.I, topic string) {
 
 	rec := sdk.Util.Source.NewRecordCreate(
 		[]byte(uuid.NewString()),
-		sdk.Metadata{"pulsar.topic": topic},
-		sdk.RawData("test-key"),
-		sdk.RawData(exampleMessage),
+		opencdc.Metadata{"pulsar.topic": topic},
+		opencdc.RawData("test-key"),
+		opencdc.RawData(exampleMessage),
 	)
 
-	written, err := con.Write(ctx, []sdk.Record{rec})
+	written, err := con.Write(ctx, []opencdc.Record{rec})
 	is.NoErr(err)
 	is.Equal(written, 1)
 }
@@ -105,7 +106,7 @@ func pulsarGoClientRead(is *is.I, topic string) {
 
 	var received struct {
 		Payload struct {
-			After sdk.RawData `json:"after"`
+			After opencdc.RawData `json:"after"`
 		} `json:"payload"`
 	}
 	err = json.Unmarshal(msg.Payload(), &received)

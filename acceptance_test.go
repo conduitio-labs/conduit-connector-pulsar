@@ -28,21 +28,27 @@ func TestAcceptance(t *testing.T) {
 	is := is.New(t)
 
 	topic := test.SetupTopicName(t, is)
-	cfg := map[string]string{
-		"url":              test.PulsarURL,
-		"topic":            topic,
-		"subscriptionName": "test-subscription",
+	sourceCfg := map[string]string{
+		SourceConfigUrl:              test.PulsarURL,
+		SourceConfigTopic:            topic,
+		SourceConfigSubscriptionName: "test-subscription",
+	}
+
+	destCfg := map[string]string{
+		DestinationConfigUrl:   test.PulsarURL,
+		DestinationConfigTopic: topic,
 	}
 
 	sdk.AcceptanceTest(t, sdk.ConfigurableAcceptanceTestDriver{
 		Config: sdk.ConfigurableAcceptanceTestDriverConfig{
 			Connector:         Connector,
 			GoleakOptions:     []goleak.Option{goleak.IgnoreCurrent()},
-			SourceConfig:      cfg,
-			DestinationConfig: cfg,
+			SourceConfig:      sourceCfg,
+			DestinationConfig: destCfg,
 			BeforeTest: func(t *testing.T) {
 				topic := test.SetupTopicName(t, is)
-				cfg["topic"] = topic
+				sourceCfg[SourceConfigTopic] = topic
+				destCfg[DestinationConfigTopic] = topic
 			},
 			Skip: []string{
 				"TestSource_Configure_RequiredParams",

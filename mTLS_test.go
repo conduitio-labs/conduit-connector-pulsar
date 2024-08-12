@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/conduitio-labs/conduit-connector-pulsar/test"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
@@ -37,14 +38,14 @@ func Test_mTLS_Setup(t *testing.T) {
 
 	source := NewSource()
 	err := source.Configure(ctx, map[string]string{
-		"url":                        test.PulsarTLSURL,
-		"topic":                      topic,
-		"subscriptionName":           topic + "-subscription",
-		"tlsAllowInsecureConnection": "false",
-		"tlsValidateHostname":        "true",
-		"tlsCertificateFile":         "./test/certs/client.cert.pem",
-		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
-		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
+		SourceConfigUrl:                        test.PulsarTLSURL,
+		SourceConfigTopic:                      topic,
+		SourceConfigSubscriptionName:           topic + "-subscription",
+		SourceConfigTlsAllowInsecureConnection: "false",
+		SourceConfigTlsValidateHostname:        "true",
+		SourceConfigTlsCertificateFile:         "./test/certs/client.cert.pem",
+		SourceConfigTlsKeyFilePath:             "./test/certs/client.key-pk8.pem",
+		SourceConfigTlsTrustCertsFilePath:      "./test/certs/ca.cert.pem",
 	})
 	is.NoErr(err)
 
@@ -58,13 +59,13 @@ func Test_mTLS_Setup(t *testing.T) {
 
 	destination := NewDestination()
 	err = destination.Configure(ctx, map[string]string{
-		"url":                        test.PulsarTLSURL,
-		"topic":                      topic,
-		"tlsAllowInsecureConnection": "false",
-		"tlsValidateHostname":        "true",
-		"tlsCertificateFile":         "./test/certs/client.cert.pem",
-		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
-		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
+		DestinationConfigUrl:                        test.PulsarTLSURL,
+		DestinationConfigTopic:                      topic,
+		DestinationConfigTlsAllowInsecureConnection: "false",
+		DestinationConfigTlsValidateHostname:        "true",
+		DestinationConfigTlsCertificateFile:         "./test/certs/client.cert.pem",
+		DestinationConfigTlsKeyFilePath:             "./test/certs/client.key-pk8.pem",
+		DestinationConfigTlsTrustCertsFilePath:      "./test/certs/ca.cert.pem",
 	})
 	is.NoErr(err)
 
@@ -78,12 +79,12 @@ func Test_mTLS_Setup(t *testing.T) {
 
 	rec := sdk.Util.Source.NewRecordCreate(
 		[]byte(uuid.NewString()),
-		sdk.Metadata{"pulsar.topic": topic},
-		sdk.RawData("test-key"),
-		sdk.RawData(exampleMessage),
+		opencdc.Metadata{"pulsar.topic": topic},
+		opencdc.RawData("test-key"),
+		opencdc.RawData(exampleMessage),
 	)
 
-	_, err = destination.Write(ctx, []sdk.Record{rec})
+	_, err = destination.Write(ctx, []opencdc.Record{rec})
 	is.NoErr(err)
 
 	readRec, err := source.Read(ctx)

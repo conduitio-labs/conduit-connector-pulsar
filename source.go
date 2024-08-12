@@ -21,6 +21,8 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
+	"github.com/conduitio/conduit-commons/config"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
 )
@@ -37,12 +39,12 @@ func NewSource() sdk.Source {
 	return sdk.SourceWithMiddleware(&Source{}, sdk.DefaultSourceMiddleware()...)
 }
 
-func (s *Source) Parameters() map[string]sdk.Parameter {
+func (s *Source) Parameters() config.Parameters {
 	return s.config.Parameters()
 }
 
-func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
-	if err := sdk.Util.ParseConfig(cfg, &s.config); err != nil {
+func (s *Source) Configure(ctx context.Context, cfg config.Config) error {
+	if err := sdk.Util.ParseConfig(ctx, cfg, &s.config, s.config.Parameters()); err != nil {
 		return fmt.Errorf("failed to parse config: %w", err)
 	}
 
@@ -51,9 +53,9 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(ctx context.Context, pos sdk.Position) (err error) {
+func (s *Source) Open(ctx context.Context, pos opencdc.Position) (err error) {
 	var logger log.Logger
-	if s.config.disableLogging {
+	if s.config.DisableLogging {
 		logger = log.DefaultNopLogger()
 	}
 
@@ -113,10 +115,10 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) (err error) {
 	return nil
 }
 
-func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
+func (s *Source) Read(ctx context.Context) (opencdc.Record, error) {
 	msg, err := s.consumer.Receive(ctx)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("failed to receive message: %w", err)
+		return opencdc.Record{}, fmt.Errorf("failed to receive message: %w", err)
 	}
 
 	position := Position{
@@ -125,11 +127,11 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	}
 	sdkPos := position.ToSDKPosition()
 
-	metadata := sdk.Metadata{"pulsar.topic": msg.Topic()}
+	metadata := opencdc.Metadata{"pulsar.topic": msg.Topic()}
 	metadata.SetCreatedAt(msg.EventTime())
 
-	key := sdk.RawData(msg.Key())
-	payload := sdk.RawData(msg.Payload())
+	key := opencdc.RawData(msg.Key())
+	payload := opencdc.RawData(msg.Payload())
 
 	newRecord := sdk.Util.Source.NewRecordCreate(sdkPos, metadata, key, payload)
 
@@ -138,7 +140,7 @@ func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	return newRecord, nil
 }
 
-func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
+func (s *Source) Ack(ctx context.Context, position opencdc.Position) error {
 	parsed, err := parsePosition(position)
 	if err != nil {
 		return err
@@ -177,7 +179,7 @@ type Position struct {
 	SubscriptionName string `json:"subscriptionName"`
 }
 
-func parsePosition(pos sdk.Position) (Position, error) {
+func parsePosition(pos opencdc.Position) (Position, error) {
 	var p Position
 	err := json.Unmarshal(pos, &p)
 	if err != nil {
@@ -186,7 +188,7 @@ func parsePosition(pos sdk.Position) (Position, error) {
 	return p, nil
 }
 
-func (p Position) ToSDKPosition() sdk.Position {
+func (p Position) ToSDKPosition() opencdc.Position {
 	bs, err := json.Marshal(p)
 	if err != nil {
 		// this error should not be possible
