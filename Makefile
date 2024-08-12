@@ -43,7 +43,7 @@ install-tools:
 
 .PHONY: up
 up:
-	docker compose -f test/docker-compose.yml up --quiet-pull -d --wait 
+	docker compose -f test/docker-compose.yml up pulsar --quiet-pull -d --wait
 
 .PHONY: down
 down:
