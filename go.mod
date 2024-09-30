@@ -3,7 +3,7 @@ module github.com/conduitio-labs/conduit-connector-pulsar
 go 1.22.6
 
 require (
-	github.com/apache/pulsar-client-go v0.13.1
+	github.com/apache/pulsar-client-go v0.14.0
 	github.com/conduitio/conduit-commons v0.3.0
 	github.com/conduitio/conduit-connector-sdk v0.10.1
 	github.com/golangci/golangci-lint v1.61.0
