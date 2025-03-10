@@ -21,7 +21,6 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
-	"github.com/conduitio/conduit-commons/config"
 	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/google/uuid"
@@ -35,22 +34,12 @@ type Source struct {
 	config   SourceConfig
 }
 
+func (s *Source) Config() sdk.SourceConfig {
+	return &s.config
+}
+
 func NewSource() sdk.Source {
-	return sdk.SourceWithMiddleware(&Source{}, sdk.DefaultSourceMiddleware()...)
-}
-
-func (s *Source) Parameters() config.Parameters {
-	return s.config.Parameters()
-}
-
-func (s *Source) Configure(ctx context.Context, cfg config.Config) error {
-	if err := sdk.Util.ParseConfig(ctx, cfg, &s.config, s.config.Parameters()); err != nil {
-		return fmt.Errorf("failed to parse config: %w", err)
-	}
-
-	sdk.Logger(ctx).Info().Str("topic", s.config.Topic).Msg("configured source")
-
-	return nil
+	return sdk.SourceWithMiddleware(&Source{})
 }
 
 func (s *Source) Open(ctx context.Context, pos opencdc.Position) (err error) {

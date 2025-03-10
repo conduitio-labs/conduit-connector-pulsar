@@ -35,18 +35,17 @@ func Test_mTLS_Setup(t *testing.T) {
 
 	topic := test.SetupTopicName(t, is)
 	ctx := context.Background()
-
 	source := NewSource()
-	err := source.Configure(ctx, map[string]string{
-		SourceConfigUrl:                        test.PulsarTLSURL,
-		SourceConfigTopic:                      topic,
-		SourceConfigSubscriptionName:           topic + "-subscription",
-		SourceConfigTlsAllowInsecureConnection: "false",
-		SourceConfigTlsValidateHostname:        "true",
-		SourceConfigTlsCertificateFile:         "./test/certs/client.cert.pem",
-		SourceConfigTlsKeyFilePath:             "./test/certs/client.key-pk8.pem",
-		SourceConfigTlsTrustCertsFilePath:      "./test/certs/ca.cert.pem",
-	})
+	err := sdk.Util.ParseConfig(ctx, map[string]string{
+		"url":                        test.PulsarTLSURL,
+		"topic":                      topic,
+		"subscriptionName":           topic + "-subscription",
+		"tlsAllowInsecureConnection": "false",
+		"tlsValidateHostname":        "true",
+		"tlsCertificateFile":         "./test/certs/client.cert.pem",
+		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
+		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
+	}, source.Config(), Connector.NewSpecification().SourceParams)
 	is.NoErr(err)
 
 	err = source.Open(ctx, nil)
@@ -58,15 +57,15 @@ func Test_mTLS_Setup(t *testing.T) {
 	}()
 
 	destination := NewDestination()
-	err = destination.Configure(ctx, map[string]string{
-		DestinationConfigUrl:                        test.PulsarTLSURL,
-		DestinationConfigTopic:                      topic,
-		DestinationConfigTlsAllowInsecureConnection: "false",
-		DestinationConfigTlsValidateHostname:        "true",
-		DestinationConfigTlsCertificateFile:         "./test/certs/client.cert.pem",
-		DestinationConfigTlsKeyFilePath:             "./test/certs/client.key-pk8.pem",
-		DestinationConfigTlsTrustCertsFilePath:      "./test/certs/ca.cert.pem",
-	})
+	err = sdk.Util.ParseConfig(ctx, map[string]string{
+		"url":                        test.PulsarTLSURL,
+		"topic":                      topic,
+		"tlsAllowInsecureConnection": "false",
+		"tlsValidateHostname":        "true",
+		"tlsCertificateFile":         "./test/certs/client.cert.pem",
+		"tlsKeyFilePath":             "./test/certs/client.key-pk8.pem",
+		"tlsTrustCertsFilePath":      "./test/certs/ca.cert.pem",
+	}, destination.Config(), Connector.NewSpecification().DestinationParams)
 	is.NoErr(err)
 
 	err = destination.Open(ctx)
