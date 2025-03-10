@@ -26,17 +26,16 @@ import (
 
 func TestAcceptance(t *testing.T) {
 	is := is.New(t)
-
 	topic := test.SetupTopicName(t, is)
 	sourceCfg := map[string]string{
-		SourceConfigUrl:              test.PulsarURL,
-		SourceConfigTopic:            topic,
-		SourceConfigSubscriptionName: "test-subscription",
+		"url":              test.PulsarURL,
+		"topic":            topic,
+		"subscriptionName": "test-subscription",
 	}
 
 	destCfg := map[string]string{
-		DestinationConfigUrl:   test.PulsarURL,
-		DestinationConfigTopic: topic,
+		"url":   test.PulsarURL,
+		"topic": topic,
 	}
 
 	sdk.AcceptanceTest(t, sdk.ConfigurableAcceptanceTestDriver{
@@ -47,8 +46,8 @@ func TestAcceptance(t *testing.T) {
 			DestinationConfig: destCfg,
 			BeforeTest: func(t *testing.T) {
 				topic := test.SetupTopicName(t, is)
-				sourceCfg[SourceConfigTopic] = topic
-				destCfg[DestinationConfigTopic] = topic
+				sourceCfg["topic"] = topic
+				destCfg["topic"] = topic
 			},
 			Skip: []string{
 				"TestSource_Configure_RequiredParams",

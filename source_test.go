@@ -22,6 +22,7 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/conduitio-labs/conduit-connector-pulsar/test"
 	"github.com/conduitio/conduit-commons/opencdc"
+	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/matryer/is"
 )
 
@@ -34,12 +35,12 @@ func TestTeardownSource_NoOpen(t *testing.T) {
 
 func newSourceCfg(topic string) map[string]string {
 	return map[string]string{
-		SourceConfigUrl:               test.PulsarURL,
-		SourceConfigTopic:             topic,
-		SourceConfigSubscriptionName:  topic + "-subscription",
-		SourceConfigDisableLogging:    "true",
-		SourceConfigConnectionTimeout: "10s",
-		SourceConfigOperationTimeout:  "10s",
+		"url":               test.PulsarURL,
+		"topic":             topic,
+		"subscriptionName":  topic + "-subscription",
+		"disableLogging":    "true",
+		"connectionTimeout": "10s",
+		"operationTimeout":  "10s",
 	}
 }
 
@@ -127,20 +128,20 @@ func testSourceIntegrationRead(
 ) opencdc.Position {
 	ctx := context.Background()
 
-	underTest := NewSource()
+	src := NewSource()
 	defer func() {
-		err := underTest.Teardown(ctx)
+		err := src.Teardown(ctx)
 		is.NoErr(err)
 	}()
 
-	err := underTest.Configure(ctx, cfgMap)
+	err := sdk.Util.ParseConfig(ctx, cfgMap, src.Config(), Connector.NewSpecification().SourceParams)
 	is.NoErr(err)
-	err = underTest.Open(ctx, startFrom)
-	is.NoErr(err)
+
+	is.NoErr(src.Open(ctx, startFrom))
 
 	var positions []opencdc.Position
 	for _, wantRecord := range wantRecords {
-		rec, err := underTest.Read(ctx)
+		rec, err := src.Read(ctx)
 		is.NoErr(err)
 
 		recKey := string(rec.Key.Bytes())
@@ -153,7 +154,7 @@ func testSourceIntegrationRead(
 		if i > 0 && ackFirstOnly {
 			break
 		}
-		err = underTest.Ack(ctx, p)
+		err = src.Ack(ctx, p)
 		is.NoErr(err)
 	}
 

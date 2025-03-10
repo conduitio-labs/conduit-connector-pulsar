@@ -16,10 +16,9 @@ package pulsar
 
 import (
 	"time"
-)
 
-//go:generate paramgen -output=paramgen_src.go SourceConfig
-//go:generate paramgen -output=paramgen_dest.go DestinationConfig
+	sdk "github.com/conduitio/conduit-connector-sdk"
+)
 
 type Config struct {
 	// URL of the Pulsar instance to connect to.
@@ -66,6 +65,7 @@ type Config struct {
 }
 
 type SourceConfig struct {
+	sdk.DefaultSourceMiddleware
 	Config
 
 	// SubscriptionName is the name of the subscription to be used for
@@ -74,5 +74,6 @@ type SourceConfig struct {
 }
 
 type DestinationConfig struct {
+	sdk.DefaultDestinationMiddleware
 	Config
 }

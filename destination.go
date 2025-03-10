@@ -20,7 +20,6 @@ import (
 
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/pulsar-client-go/pulsar/log"
-	"github.com/conduitio/conduit-commons/config"
 	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 )
@@ -33,20 +32,12 @@ type Destination struct {
 	config   DestinationConfig
 }
 
+func (d *Destination) Config() sdk.DestinationConfig {
+	return &d.config
+}
+
 func NewDestination() sdk.Destination {
-	return sdk.DestinationWithMiddleware(&Destination{}, sdk.DefaultDestinationMiddleware()...)
-}
-
-func (d *Destination) Parameters() config.Parameters {
-	return d.config.Parameters()
-}
-
-func (d *Destination) Configure(ctx context.Context, cfg config.Config) error {
-	if err := sdk.Util.ParseConfig(ctx, cfg, &d.config, d.config.Parameters()); err != nil {
-		return fmt.Errorf("failed to parse config: %w", err)
-	}
-
-	return nil
+	return sdk.DestinationWithMiddleware(&Destination{})
 }
 
 func (d *Destination) Open(ctx context.Context) (err error) {

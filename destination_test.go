@@ -66,15 +66,14 @@ func connectorDestinationWrite(is *is.I, topic string) {
 	ctx := context.Background()
 
 	cfgMap := map[string]string{
-		DestinationConfigUrl:   test.PulsarURL,
-		DestinationConfigTopic: topic,
+		"url":   test.PulsarURL,
+		"topic": topic,
 	}
 
-	err := con.Configure(ctx, cfgMap)
+	err := sdk.Util.ParseConfig(ctx, cfgMap, con.Config(), Connector.NewSpecification().DestinationParams)
 	is.NoErr(err)
 
-	err = con.Open(ctx)
-	is.NoErr(err)
+	is.NoErr(con.Open(ctx))
 
 	rec := sdk.Util.Source.NewRecordCreate(
 		[]byte(uuid.NewString()),
