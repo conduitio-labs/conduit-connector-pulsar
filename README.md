@@ -24,70 +24,64 @@ pipelines:
       - id: example
         plugin: "pulsar"
         settings:
-          # Topic specifies the Pulsar topic used by the connector.
+          # The Pulsar topic used by the connector.
           # Type: string
           # Required: yes
           topic: ""
-          # URL of the Pulsar instance to connect to.
+          # The pulsar instance to connect to.
           # Type: string
           # Required: yes
           url: ""
-          # ConnectionTimeout specifies the duration for which the client will
-          # attempt to establish a connection before timing out.
+          # The duration for which the client will attempt to establish a
+          # connection before timing out.
           # Type: duration
           # Required: no
           connectionTimeout: "0s"
-          # DisableLogging disables pulsar client logs
+          # Disables pulsar client logs
           # Type: bool
           # Required: no
           disableLogging: "false"
-          # EnableTransaction determines if the client should support
-          # transactions.
+          # Determines if the client should support transactions.
           # Type: bool
           # Required: no
           enableTransaction: "false"
-          # MaxConnectionsPerBroker limits the number of connections to each
-          # broker.
+          # Limits the number of connections to each broker.
           # Type: int
           # Required: no
           maxConnectionsPerBroker: "0"
-          # MemoryLimitBytes sets the memory limit for the client in bytes. If
-          # the limit is exceeded, the client may start to block or fail
-          # operations.
+          # Sets the memory limit for the client in bytes. If the limit is
+          # exceeded, the client may start to block or fail operations.
           # Type: int
           # Required: no
           memoryLimitBytes: "0"
-          # OperationTimeout is the duration after which an operation is
-          # considered to have timed out.
+          # The duration after which an operation is considered to have timed
+          # out.
           # Type: duration
           # Required: no
           operationTimeout: "0s"
-          # SubscriptionName is the name of the subscription to be used for
-          # consuming messages.
+          # The name of the subscription to be used for consuming messages.
           # Type: string
           # Required: no
           subscriptionName: ""
-          # TLSAllowInsecureConnection configures whether the internal Pulsar
-          # client accepts untrusted TLS certificate from broker (default:
-          # false)
+          # Whether the internal Pulsar client accepts untrusted TLS certificate
+          # from broker (default: false)
           # Type: bool
           # Required: no
           tlsAllowInsecureConnection: "false"
-          # TLSCertificateFile sets the path to the TLS certificate file
+          # The path to the TLS certificate file
           # Type: string
           # Required: no
           tlsCertificateFile: ""
-          # TLSKeyFilePath sets the path to the TLS key file
+          # The path to the TLS key file
           # Type: string
           # Required: no
           tlsKeyFilePath: ""
-          # TLSTrustCertsFilePath sets the path to the trusted TLS certificate
-          # file
+          # The path to the trusted TLS certificate file
           # Type: string
           # Required: no
           tlsTrustCertsFilePath: ""
-          # TLSValidateHostname configures whether the Pulsar client verifies
-          # the validity of the host name from broker (default: false)
+          # Whether the pulsar client verifies the validity of the host name
+          # from broker (default: false)
           # Type: bool
           # Required: no
           tlsValidateHostname: "false"
@@ -150,65 +144,60 @@ pipelines:
       - id: example
         plugin: "pulsar"
         settings:
-          # Topic specifies the Pulsar topic used by the connector.
+          # The Pulsar topic used by the connector.
           # Type: string
           # Required: yes
           topic: ""
-          # URL of the Pulsar instance to connect to.
+          # The pulsar instance to connect to.
           # Type: string
           # Required: yes
           url: ""
-          # ConnectionTimeout specifies the duration for which the client will
-          # attempt to establish a connection before timing out.
+          # The duration for which the client will attempt to establish a
+          # connection before timing out.
           # Type: duration
           # Required: no
           connectionTimeout: "0s"
-          # DisableLogging disables pulsar client logs
+          # Disables pulsar client logs
           # Type: bool
           # Required: no
           disableLogging: "false"
-          # EnableTransaction determines if the client should support
-          # transactions.
+          # Determines if the client should support transactions.
           # Type: bool
           # Required: no
           enableTransaction: "false"
-          # MaxConnectionsPerBroker limits the number of connections to each
-          # broker.
+          # Limits the number of connections to each broker.
           # Type: int
           # Required: no
           maxConnectionsPerBroker: "0"
-          # MemoryLimitBytes sets the memory limit for the client in bytes. If
-          # the limit is exceeded, the client may start to block or fail
-          # operations.
+          # Sets the memory limit for the client in bytes. If the limit is
+          # exceeded, the client may start to block or fail operations.
           # Type: int
           # Required: no
           memoryLimitBytes: "0"
-          # OperationTimeout is the duration after which an operation is
-          # considered to have timed out.
+          # The duration after which an operation is considered to have timed
+          # out.
           # Type: duration
           # Required: no
           operationTimeout: "0s"
-          # TLSAllowInsecureConnection configures whether the internal Pulsar
-          # client accepts untrusted TLS certificate from broker (default:
-          # false)
+          # Whether the internal Pulsar client accepts untrusted TLS certificate
+          # from broker (default: false)
           # Type: bool
           # Required: no
           tlsAllowInsecureConnection: "false"
-          # TLSCertificateFile sets the path to the TLS certificate file
+          # The path to the TLS certificate file
           # Type: string
           # Required: no
           tlsCertificateFile: ""
-          # TLSKeyFilePath sets the path to the TLS key file
+          # The path to the TLS key file
           # Type: string
           # Required: no
           tlsKeyFilePath: ""
-          # TLSTrustCertsFilePath sets the path to the trusted TLS certificate
-          # file
+          # The path to the trusted TLS certificate file
           # Type: string
           # Required: no
           tlsTrustCertsFilePath: ""
-          # TLSValidateHostname configures whether the Pulsar client verifies
-          # the validity of the host name from broker (default: false)
+          # Whether the pulsar client verifies the validity of the host name
+          # from broker (default: false)
           # Type: bool
           # Required: no
           tlsValidateHostname: "false"

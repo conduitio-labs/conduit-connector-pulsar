@@ -21,46 +21,46 @@ import (
 )
 
 type Config struct {
-	// URL of the Pulsar instance to connect to.
+	// The pulsar instance to connect to.
 	URL string `json:"url" validate:"required"`
 
-	// Topic specifies the Pulsar topic used by the connector.
+	// The Pulsar topic used by the connector.
 	Topic string `json:"topic" validate:"required"`
 
-	// ConnectionTimeout specifies the duration for which the client will
+	// The duration for which the client will
 	// attempt to establish a connection before timing out.
 	ConnectionTimeout time.Duration `json:"connectionTimeout"`
 
-	// OperationTimeout is the duration after which an operation is considered
+	// The duration after which an operation is considered
 	// to have timed out.
 	OperationTimeout time.Duration `json:"operationTimeout"`
 
-	// MaxConnectionsPerBroker limits the number of connections to each broker.
+	// Limits the number of connections to each broker.
 	MaxConnectionsPerBroker int `json:"maxConnectionsPerBroker"`
 
-	// MemoryLimitBytes sets the memory limit for the client in bytes.
+	// Sets the memory limit for the client in bytes.
 	// If the limit is exceeded, the client may start to block or fail operations.
 	MemoryLimitBytes int64 `json:"memoryLimitBytes"`
 
-	// EnableTransaction determines if the client should support transactions.
+	// Determines if the client should support transactions.
 	EnableTransaction bool `json:"enableTransaction"`
 
-	// TLSKeyFilePath sets the path to the TLS key file
+	// The path to the TLS key file
 	TLSKeyFilePath string `json:"tlsKeyFilePath"`
 
-	// TLSCertificateFile sets the path to the TLS certificate file
+	// The path to the TLS certificate file
 	TLSCertificateFile string `json:"tlsCertificateFile"`
 
-	// TLSTrustCertsFilePath sets the path to the trusted TLS certificate file
+	// The path to the trusted TLS certificate file
 	TLSTrustCertsFilePath string `json:"tlsTrustCertsFilePath"`
 
-	// TLSAllowInsecureConnection configures whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)
+	// Whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)
 	TLSAllowInsecureConnection bool `json:"tlsAllowInsecureConnection"`
 
-	// TLSValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)
+	// Whether the pulsar client verifies the validity of the host name from broker (default: false)
 	TLSValidateHostname bool `json:"tlsValidateHostname"`
 
-	// DisableLogging disables pulsar client logs
+	// Disables pulsar client logs
 	DisableLogging bool `json:"disableLogging"`
 }
 
@@ -68,8 +68,7 @@ type SourceConfig struct {
 	sdk.DefaultSourceMiddleware
 	Config
 
-	// SubscriptionName is the name of the subscription to be used for
-	// consuming messages.
+	// The name of the subscription to be used for consuming messages.
 	SubscriptionName string `json:"subscriptionName"`
 }
 
