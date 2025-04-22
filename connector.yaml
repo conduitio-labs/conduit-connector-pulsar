@@ -8,14 +8,14 @@ specification:
   source:
     parameters:
       - name: topic
-        description: Topic specifies the Pulsar topic used by the connector.
+        description: The Pulsar topic used by the connector.
         type: string
         default: ""
         validations:
           - type: required
             value: ""
       - name: url
-        description: URL of the Pulsar instance to connect to.
+        description: The pulsar instance to connect to.
         type: string
         default: ""
         validations:
@@ -23,69 +23,67 @@ specification:
             value: ""
       - name: connectionTimeout
         description: |-
-          ConnectionTimeout specifies the duration for which the client will
+          The duration for which the client will
           attempt to establish a connection before timing out.
         type: duration
         default: ""
         validations: []
       - name: disableLogging
-        description: DisableLogging disables pulsar client logs
+        description: Disables pulsar client logs
         type: bool
         default: ""
         validations: []
       - name: enableTransaction
-        description: EnableTransaction determines if the client should support transactions.
+        description: Determines if the client should support transactions.
         type: bool
         default: ""
         validations: []
       - name: maxConnectionsPerBroker
-        description: MaxConnectionsPerBroker limits the number of connections to each broker.
+        description: Limits the number of connections to each broker.
         type: int
         default: ""
         validations: []
       - name: memoryLimitBytes
         description: |-
-          MemoryLimitBytes sets the memory limit for the client in bytes.
+          Sets the memory limit for the client in bytes.
           If the limit is exceeded, the client may start to block or fail operations.
         type: int
         default: ""
         validations: []
       - name: operationTimeout
         description: |-
-          OperationTimeout is the duration after which an operation is considered
+          The duration after which an operation is considered
           to have timed out.
         type: duration
         default: ""
         validations: []
       - name: subscriptionName
-        description: |-
-          SubscriptionName is the name of the subscription to be used for
-          consuming messages.
+        description: The name of the subscription to be used for consuming messages.
         type: string
         default: ""
         validations: []
       - name: tlsAllowInsecureConnection
-        description: 'TLSAllowInsecureConnection configures whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)'
+        description: 'Whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)'
         type: bool
         default: ""
         validations: []
       - name: tlsCertificateFile
-        description: TLSCertificateFile sets the path to the TLS certificate file
+        description: The path to the TLS certificate file
         type: string
         default: ""
         validations: []
       - name: tlsKeyFilePath
-        description: TLSKeyFilePath sets the path to the TLS key file
+        description: The path to the TLS key file
         type: string
         default: ""
         validations: []
       - name: tlsTrustCertsFilePath
-        description: TLSTrustCertsFilePath sets the path to the trusted TLS certificate file
+        description: The path to the trusted TLS certificate file
         type: string
         default: ""
         validations: []
       - name: tlsValidateHostname
-        description: 'TLSValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)'
+        description: 'Whether the pulsar client verifies the validity of the host name from broker (default: false)'
         type: bool
         default: ""
         validations: []
@@ -152,14 +150,14 @@ specification:
   destination:
     parameters:
       - name: topic
-        description: Topic specifies the Pulsar topic used by the connector.
+        description: The Pulsar topic used by the connector.
         type: string
         default: ""
         validations:
           - type: required
             value: ""
       - name: url
-        description: URL of the Pulsar instance to connect to.
+        description: The pulsar instance to connect to.
         type: string
         default: ""
         validations:
@@ -167,62 +165,62 @@ specification:
             value: ""
       - name: connectionTimeout
         description: |-
-          ConnectionTimeout specifies the duration for which the client will
+          The duration for which the client will
           attempt to establish a connection before timing out.
         type: duration
         default: ""
         validations: []
       - name: disableLogging
-        description: DisableLogging disables pulsar client logs
+        description: Disables pulsar client logs
         type: bool
         default: ""
         validations: []
       - name: enableTransaction
-        description: EnableTransaction determines if the client should support transactions.
+        description: Determines if the client should support transactions.
         type: bool
         default: ""
         validations: []
       - name: maxConnectionsPerBroker
-        description: MaxConnectionsPerBroker limits the number of connections to each broker.
+        description: Limits the number of connections to each broker.
         type: int
         default: ""
         validations: []
       - name: memoryLimitBytes
         description: |-
-          MemoryLimitBytes sets the memory limit for the client in bytes.
+          Sets the memory limit for the client in bytes.
           If the limit is exceeded, the client may start to block or fail operations.
         type: int
         default: ""
         validations: []
       - name: operationTimeout
         description: |-
-          OperationTimeout is the duration after which an operation is considered
+          The duration after which an operation is considered
           to have timed out.
         type: duration
         default: ""
         validations: []
       - name: tlsAllowInsecureConnection
-        description: 'TLSAllowInsecureConnection configures whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)'
+        description: 'Whether the internal Pulsar client accepts untrusted TLS certificate from broker (default: false)'
         type: bool
         default: ""
         validations: []
       - name: tlsCertificateFile
-        description: TLSCertificateFile sets the path to the TLS certificate file
+        description: The path to the TLS certificate file
         type: string
         default: ""
         validations: []
       - name: tlsKeyFilePath
-        description: TLSKeyFilePath sets the path to the TLS key file
+        description: The path to the TLS key file
         type: string
         default: ""
         validations: []
       - name: tlsTrustCertsFilePath
-        description: TLSTrustCertsFilePath sets the path to the trusted TLS certificate file
+        description: The path to the trusted TLS certificate file
         type: string
         default: ""
         validations: []
       - name: tlsValidateHostname
-        description: 'TLSValidateHostname configures whether the Pulsar client verifies the validity of the host name from broker (default: false)'
+        description: 'Whether the pulsar client verifies the validity of the host name from broker (default: false)'
         type: bool
         default: ""
         validations: []
