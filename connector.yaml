@@ -3,7 +3,7 @@ specification:
   name: pulsar
   summary: An Apache Pulsar source and destination plugin for Conduit, written in Go.
   description: An Apache Pulsar source and destination plugin for Conduit, written in Go.
-  version: (devel)
+  version: v0.1.1
   author: Meroxa, Inc.
   source:
     parameters:
